@@ -1,89 +1,89 @@
-# Connection Pooling — چیست و چرا؟
+# Connection Pooling — What and Why?
 
-## مسئله
+## The problem
 
-باز کردن اتصال به دیتابیس **گران** است:
+Opening a database connection is **expensive**:
 
-- handshake TCP  
-- احراز هویت  
-- تخصیص حافظه سمت سرور  
+- TCP handshake  
+- Authentication  
+- Server-side memory allocation  
 
-اگر برای هر HTTP request یک اتصال جدید باز و بسته کنی، زیر بار می‌سوزی.
+If every HTTP request opens and closes a new connection, you melt under load.
 
 ---
 
-## Connection Pool چیست؟
+## What is a connection pool?
 
-یک **مجموعهٔ آماده از اتصال‌ها** که برنامه قرض می‌گیرد و برمی‌گرداند:
+A **ready set of connections** the app borrows and returns:
 
 ```
 Request → borrow conn → query → release conn → Pool
 ```
 
-به‌جای:
+Instead of:
 
 ```
-Request → open → query → close  (هر بار از صفر)
+Request → open → query → close  (from scratch every time)
 ```
 
 ---
 
-## چرا مهم است؟
+## Why it matters
 
-| بدون pool | با pool |
+| Without pool | With pool |
+|--------------|-----------|
+| High latency | Fast reuse |
+| Pressure on DB with too many connections | Controlled ceiling (`max_connections`) |
+| Thundering herd on spikes | Clear wait queue / timeout |
+
+Databases have a `max_connections` limit. 100 apps × 50 raw connections = disaster.
+
+---
+
+## Common parameters
+
+| Parameter | Meaning |
 |-----------|---------|
-| latency بالا | reuse سریع |
-| فشار به DB با اتصال زیاد | سقف کنترل‌شده (`max_connections`) |
-| thundering herd هنگام spike | صف انتظار / timeout مشخص |
+| `min` / idle size | Warm connections ready |
+| `max` | Concurrent ceiling |
+| `idle timeout` | Close idle connections |
+| `max lifetime` | Rotate before network/NAT issues |
+| `acquire timeout` | How long to wait if the pool is empty |
 
-دیتابیس معمولاً حد `max_connections` دارد. ۱۰۰ اپ × ۵۰ اتصال خام = فاجعه.
-
----
-
-## پارامترهای رایج
-
-| پارامتر | معنی |
-|---------|------|
-| `min` / idle size | اتصال‌های گرم آماده |
-| `max` | سقف همزمان |
-| `idle timeout` | بستن اتصال بیکار |
-| `max lifetime` | چرخش اتصال قبل از مشکل شبکه/NAT |
-| `acquire timeout` | اگر pool خالی بود چقدر صبر کن |
-
-مثال PDO / مفهومی:
+Conceptual PDO note:
 
 ```ini
 ; PHP-FPM workers × connections_per_worker ≈ total to DB
-; پس max pool را با تعداد worker هماهنگ کن
+; Align max pool with worker count
 ```
 
-در Laravel اغلب از طریق persistent connections / proxyهایی مثل **PgBouncer** / **ProxySQL** مدیریت می‌شود.
+In Laravel this is often managed via persistent connections / proxies like **PgBouncer** / **ProxySQL**.
 
 ---
 
-## External Pooler
+## External pooler
 
-برای Postgres خیلی رایج است:
+Very common for Postgres:
 
 ```
 App → PgBouncer → PostgreSQL
 ```
 
-مزیت: صدها کلاینت اپ به تعداد کمتری اتصال واقعی روی DB نگاشت می‌شوند (transaction pooling).
+Benefit: hundreds of app clients map to fewer real DB connections (transaction pooling).
 
 ---
 
-## ضدالگو
+## Antipatterns
 
-- `max` خیلی بزرگ روی هر instance بدون حساب کل  
-- نگه داشتن اتصال داخل job طولانی بدون نیاز  
-- leak: borrow بدون release در path خطا  
-- فرض اینکه «Laravel خودش همیشه بهینه pool می‌کند» بدون اندازه‌گیری
+- Huge `max` per instance without totaling across the fleet  
+- Holding a connection across a long job without need  
+- Leak: borrow without release on error paths  
+- Assuming “Laravel always pools optimally” without measuring
 
 ---
 
-## قانون تصمیم
+## Decision rule
 
-1. تعداد worker/process × اتصال را حساب کن؛ از `max_connections` کمتر بمان.  
-2. برای مقیاس افقی، pooler بیرونی را جدی بگیر.  
-3. متریک: انتظار برای اتصال، زمان acquire، تعداد اتصال فعال.
+1. Compute workers/processes × connections; stay under `max_connections`.  
+2. For horizontal scale, take an external pooler seriously.  
+3. Metrics: wait for connection, acquire time, active connection count.

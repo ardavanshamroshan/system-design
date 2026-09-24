@@ -61,7 +61,6 @@
 
 html {
   font-optical-sizing: auto;
-  direction: rtl;
 }
 
 .VPNavBarTitle .title {
@@ -216,15 +215,3 @@ div[class*='language-'] {
   border-color: var(--vp-c-brand-1) !important;
 }
 
-/* Keep code LTR even in RTL docs */
-.vp-code,
-.vp-doc pre,
-.vp-doc code,
-.vp-doc .lang {
-  direction: ltr;
-  text-align: left;
-}
-
-.vp-doc table {
-  direction: rtl;
-}

@@ -1,20 +1,20 @@
-# Profiling در Docker Compose و مدیریت چند محیط
+# Docker Compose Profiles & Multi-Environment Setup
 
-## مسئله
+## The problem
 
-می‌خواهی **یک** `docker-compose.yml` داشته باشی، ولی:
+You want **one** `docker-compose.yml`, but:
 
-- لوکال: app + mysql + mailpit + debugger  
-- CI: app + mysql (بدون UI اضافه)  
-- staging-like: + redis + worker  
+- Local: app + mysql + mailpit + debugger  
+- CI: app + mysql (no extra UI)  
+- Staging-like: + redis + worker  
 
-کپی کردن سه فایل compose → drift و دردسر.
+Copying three compose files → drift and pain.
 
 ---
 
-## راه‌حل: Compose Profiles
+## Solution: Compose profiles
 
-سرویس‌ها را با `profiles` علامت بزن؛ فقط وقتی profile فعال است بالا می‌آیند.
+Tag services with `profiles`; they only start when that profile is active.
 
 ```yaml
 services:
@@ -49,36 +49,36 @@ volumes:
   db_data:
 ```
 
-### اجرا
+### Run
 
 ```bash
-# فقط سرویس‌های بدون profile + پیش‌فرض
+# Only services without a profile
 docker compose up
 
-# محیط توسعه با میل و کش
+# Dev with mail and cache
 docker compose --profile dev --profile cache up
 
-# همه چیز
+# Everything
 docker compose --profile full up
 ```
 
 ---
 
-## چند محیط در یک فایل — الگوها
+## Multiple environments in one file — patterns
 
-### ۱) Profiles (بالا)
+### 1) Profiles (above)
 
-بهترین برای روشن/خاموش کردن سرویس‌های اختیاری.
+Best for toggling optional services.
 
-### ۲) Override files
+### 2) Override files
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
-`docker-compose.dev.yml` فقط تفاوت‌ها را دارد (volume bind، Xdebug، ...).
+`docker-compose.dev.yml` holds only the diffs (bind mounts, Xdebug, …).
 
-### ۳) متغیر محیطی
+### 3) Environment variables
 
 ```yaml
 services:
@@ -88,34 +88,34 @@ services:
       DB_HOST: ${DB_HOST:-db}
 ```
 
-فایل‌های `.env`, `.env.ci`, `.env.staging` را جدا نگه دار.
+Keep `.env`, `.env.ci`, `.env.staging` separate.
 
 ---
 
-## مثال ترکیب عملی
+## Practical combo
 
-| محیط | فرمان تقریبی |
-|------|----------------|
+| Environment | Approximate command |
+|-------------|---------------------|
 | Local dev | `compose --profile dev --profile cache up` |
 | Queue testing | `+ --profile worker` |
-| CI | بدون profile اضافه؛ فقط `app` + `db` |
+| CI | No extra profiles; just `app` + `db` |
 | Full stack | `--profile full` |
 
 ---
 
-## Profiling اپ داخل Docker
+## App profiling inside Docker
 
-«Profile» در Compose با **performance profiling** فرق دارد، ولی در کانتینر هم رایج است:
+Compose “profiles” are not the same as **performance profiling**, but both show up in containers:
 
 ```yaml
-# مثال Xdebug فقط در profile=dev
+# Example: Xdebug only with profile=dev
   app:
     profiles: ["dev"]
     environment:
       XDEBUG_MODE: ${XDEBUG_MODE:-off}
 ```
 
-برای CPU/memory:
+For CPU/memory:
 
 ```bash
 docker stats
@@ -124,16 +124,16 @@ docker compose top
 
 ---
 
-## ضدالگو
+## Antipatterns
 
-- یک compose غول‌آسا بدون profile که همه باید همه سرویس‌ها را بالا بیاورند  
-- secret داخل yaml committed  
-- bind mount سنگین بدون توجه به عملکرد روی macOS
+- One giant compose with no profiles so everyone must start every service  
+- Secrets committed in yaml  
+- Heavy bind mounts without caring about macOS performance
 
 ---
 
-## قانون تصمیم
+## Decision rule
 
-1. سرویس‌های اجباری بدون profile؛ اختیاری‌ها با profile.  
-2. تفاوت محیط را با `.env` + override بیان کن، نه سه فایل کاملاً جدا.  
-3. در README دقیقاً بنویس هر محیط کدام profile را می‌خواهد.
+1. Required services have no profile; optional ones do.  
+2. Express environment diffs with `.env` + overrides, not three fully separate files.  
+3. Document in the README exactly which profiles each environment needs.

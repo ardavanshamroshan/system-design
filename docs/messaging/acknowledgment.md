@@ -1,47 +1,47 @@
 # Message Acknowledgment Patterns
 
-## ایده
+## Idea
 
-وقتی consumer پیامی را می‌گیرد، باید به broker بگوید: «کارم باهاش تمام شد» یا «نه، برگردان/به DLQ بفرست».
+When a consumer takes a message, it must tell the broker: “I’m done” or “no — requeue / send to DLQ.”
 
-این سیگنال همان **Acknowledgment (Ack)** است.
-
----
-
-## سه الگوی اصلی
-
-| الگو | معنی | ریسک |
-|------|------|------|
-| **At-most-once** | حداکثر یک‌بار؛ ممکن است از دست برود | از دست رفتن پیام |
-| **At-least-once** | حداقل یک‌بار؛ ممکن است تکراری برسد | پردازش تکراری |
-| **Exactly-once** | دقیقاً یک‌بار (معمولاً end-to-end سخت) | پیچیدگی بالا |
-
-در عمل بیشتر سیستم‌ها **at-least-once + idempotent consumer** می‌سازند.
+That signal is the **Acknowledgment (Ack)**.
 
 ---
 
-## Auto-Ack در برابر Manual Ack
+## Three main delivery patterns
+
+| Pattern | Meaning | Risk |
+|---------|---------|------|
+| **At-most-once** | At most once; may be lost | Lost messages |
+| **At-least-once** | At least once; may duplicate | Duplicate processing |
+| **Exactly-once** | Exactly once (hard end-to-end) | High complexity |
+
+Most systems build **at-least-once + idempotent consumers**.
+
+---
+
+## Auto-Ack vs Manual Ack
 
 ### Auto-Ack
 
-به محض deliver، پیام ack می‌شود.
+The message is acked as soon as it’s delivered.
 
 ```
 Deliver → (auto ack) → Process
 ```
 
-اگر process وسطش بمیرد → پیام از دست می‌رود (**at-most-once**).
+If processing dies mid-way → the message is gone (**at-most-once**).
 
 ### Manual Ack
 
-بعد از پردازش موفق ack می‌کنی.
+You ack after successful processing.
 
 ```
 Deliver → Process → Ack
          ↘ fail → Nack / requeue / DLQ
 ```
 
-اگر قبل از ack بمیری → پیام دوباره می‌آید (**at-least-once**).
+If you die before ack → the message comes back (**at-least-once**).
 
 ```php
 $msg = $channel->wait();
@@ -55,13 +55,13 @@ try {
 
 ---
 
-## Idempotency — همراه ضروری at-least-once
+## Idempotency — required companion for at-least-once
 
-چون پیام ممکن است دوبار برسد:
+Because a message may arrive twice:
 
 ```php
 if (Inbox::alreadyProcessed($eventId)) {
-    return; // ack و تمام
+    return; // ack and done
 }
 DB::transaction(function () use ($event) {
     apply($event);
@@ -69,33 +69,33 @@ DB::transaction(function () use ($event) {
 });
 ```
 
-کلیدهای رایج: `event_id`, `idempotency-key` در API، unique constraint.
+Common keys: `event_id`, API `idempotency-key`, unique constraints.
 
 ---
 
-## Ack دیرهنگام و Prefetch
+## Late acks and prefetch
 
-اگر prefetch بالا باشد و ack دیر بدهی:
+If prefetch is high and acks are late:
 
-- یک consumer کند، پیام‌های زیاد را نگه می‌دارد  
-- بقیه بیکار می‌مانند  
+- One slow consumer holds many messages  
+- Others sit idle  
 
-تنظیمات مهم: `prefetch / qos`, timeout visibility (SQS), max processing time.
-
----
-
-## مقایسهٔ کوتاه
-
-| حالت | چه زمانی |
-|------|----------|
-| Auto-ack | لاگ‌های غیرحیاتی، قابل از دست رفتن |
-| Manual ack + retry | اکثر jobها و رویدادهای کسب‌وکار |
-| Exactly-once ادعا | فقط با تراکنش/idempotency واقعی باور کن |
+Important knobs: `prefetch / qos`, visibility timeout (SQS), max processing time.
 
 ---
 
-## قانون تصمیم
+## Short comparison
 
-1. دادهٔ مهم → manual ack + at-least-once.  
-2. همیشه برای تکرار آماده باش (idempotent).  
-3. prefetch را با ظرفیت واقعی consumer تنظیم کن.
+| Mode | When |
+|------|------|
+| Auto-ack | Non-critical logs that can be lost |
+| Manual ack + retry | Most jobs and business events |
+| “Exactly-once” claims | Only trust with real transactions/idempotency |
+
+---
+
+## Decision rule
+
+1. Important data → manual ack + at-least-once.  
+2. Always prepare for duplicates (idempotent).  
+3. Tune prefetch to real consumer capacity.

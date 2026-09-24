@@ -1,8 +1,8 @@
 # API Gateway
 
-## چیست؟
+## What is it?
 
-**API Gateway** نقطهٔ ورود واحد برای کلاینت‌هاست: درخواست‌ها را می‌گیرد، احراز هویت می‌کند، و به سرویس‌های پشت‌صحنه **مسیر می‌دهد (route)**.
+An **API Gateway** is a single entry point for clients: it receives requests, handles auth, and **routes** them to backend services.
 
 ```
 Mobile / Web / Partner
@@ -14,25 +14,25 @@ Mobile / Web / Partner
    Users Orders Payments
 ```
 
-بدون Gateway، هر کلاینت باید آدرس، auth و نسخهٔ همهٔ سرویس‌ها را بداند.
+Without a Gateway, every client must know addresses, auth, and versions for every service.
 
 ---
 
-## مسئولیت‌های رایج
+## Common responsibilities
 
-| مسئولیت | توضیح |
-|---------|--------|
+| Responsibility | Notes |
+|----------------|-------|
 | Routing | `/orders/*` → Order Service |
-| AuthN/AuthZ | JWT، API Key، mTLS |
-| Rate limiting | جلوگیری از abuse |
-| SSL termination | TLS در لبه |
-| Aggregation | ترکیب چند پاسخ (BFF-like) |
-| Observability | request id، متریک، لاگ |
+| AuthN/AuthZ | JWT, API Key, mTLS |
+| Rate limiting | Abuse protection |
+| SSL termination | TLS at the edge |
+| Aggregation | Combine responses (BFF-like) |
+| Observability | Request id, metrics, logs |
 | Versioning | `/v1` vs `/v2` |
 
 ---
 
-## مثال مفهومی (Nginx / Kong-like)
+## Conceptual example (Nginx / Kong-like)
 
 ```nginx
 location /api/users/ {
@@ -45,38 +45,38 @@ location /api/orders/ {
 }
 ```
 
-در Laravel اکوسیستم، گاهی «Gateway» یک اپ جدا با Sanctum/Passport است که به میکروسرویس‌ها پروکسی می‌کند.
+In the Laravel world, a “Gateway” is sometimes a separate app with Sanctum/Passport that proxies to microservices.
 
 ---
 
-## الگوهای مرتبط
+## Related patterns
 
-- **BFF (Backend for Frontend):** Gateway مخصوص هر کلاینت (web/mobile)  
-- **Edge Gateway:** عمومی برای همه  
-- **Service Mesh:** ارتباط سرویس-به-سرویس داخل کلاستر (مکمل Gateway، جایگزین کامل نیست)
-
----
-
-## Trade-off
-
-| مزیت | هزینه |
-|------|-------|
-| کلاینت ساده‌تر | نقطهٔ شکست مرکزی → باید HA باشد |
-| سیاست یکپارچه | latency اضافه |
-| تغییر سرویس‌ها بدون تغییر کلاینت | تبدیل شدن به God Gateway خطرناک است |
+- **BFF (Backend for Frontend):** a Gateway tailored per client (web/mobile)  
+- **Edge Gateway:** shared entry for everyone  
+- **Service Mesh:** service-to-service traffic inside the cluster (complements Gateway; doesn’t fully replace it)
 
 ---
 
-## ضدالگو
+## Trade-offs
 
-- قرار دادن تمام business logic داخل Gateway  
-- یک Gateway غول‌آسا بدون horizontal scale  
-- پنهان کردن خطاهای سرویس بدون correlation id
+| Upside | Cost |
+|--------|------|
+| Simpler clients | Central failure point → needs HA |
+| Unified policy | Extra latency |
+| Change backends without clients | Risk of becoming a God Gateway |
 
 ---
 
-## قانون تصمیم
+## Antipatterns
 
-1. چند سرویس + چند کلاینت → Gateway تقریباً ضروری است.  
-2. مونولیت ساده → شاید فقط reverse proxy کافی باشد.  
-3. Gateway را نازک نگه دار: route، security، limit — نه دامنهٔ کسب‌وکار.
+- Putting all business logic in the Gateway  
+- One giant Gateway without horizontal scale  
+- Hiding service errors without a correlation id
+
+---
+
+## Decision rule
+
+1. Multiple services + multiple clients → Gateway is nearly required.  
+2. Simple monolith → a reverse proxy may be enough.  
+3. Keep the Gateway thin: route, security, limits — not domain logic.

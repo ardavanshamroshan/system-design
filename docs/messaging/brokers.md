@@ -1,48 +1,48 @@
-# Kafka، RabbitMQ یا Redis Streams؟
+# Kafka, RabbitMQ, or Redis Streams?
 
-## سؤال درست
+## Ask the right question
 
-«کدام بهترین است؟» اشتباه است.  
-بپرس: **الگوی ترافیک، تضمین، ترتیب، و مدل مصرف** چیست؟
-
----
-
-## مقایسهٔ سریع
-
-| معیار | Kafka | RabbitMQ | Redis Streams |
-|-------|-------|----------|---------------|
-| مدل | Log توزیع‌شده | Message broker کلاسیک | Stream روی Redis |
-| Throughput | خیلی بالا | بالا (معمولاً کمتر از Kafka) | بالا برای مقیاس متوسط |
-| Retention | طولانی / replay | معمولاً تا consume | با MAXLEN / trim |
-| Routing | Topic + partition | Exchange بسیار انعطاف‌پذیر | Key / consumer group |
-| پیچیدگی ops | بیشتر | متوسط | کمتر اگر Redis داری |
-| موارد قوی | event streaming، analytics | task queue، RPC-ish، routing پیچیده | صف سبک، realtime |
+“Which is best?” is the wrong question.  
+Ask: what are the **traffic pattern, guarantees, ordering, and consumption model**?
 
 ---
 
-## Kafka — چه وقت؟
+## Quick comparison
 
-- حجم رویداد زیاد (clickstream، audit، CDC)  
-- نیاز به **replay** تاریخچه  
-- چند مصرف‌کننده مستقل از یک topic  
-- ترتیب per-partition مهم است
+| Criterion | Kafka | RabbitMQ | Redis Streams |
+|-----------|-------|----------|---------------|
+| Model | Distributed log | Classic message broker | Stream on Redis |
+| Throughput | Very high | High (usually less than Kafka) | High at moderate scale |
+| Retention | Long / replay | Usually until consumed | With MAXLEN / trim |
+| Routing | Topic + partition | Very flexible exchanges | Key / consumer group |
+| Ops complexity | Higher | Medium | Lower if you already run Redis |
+| Strengths | Event streaming, analytics | Task queues, rich routing | Lightweight queues, realtime |
+
+---
+
+## Kafka — when?
+
+- High event volume (clickstream, audit, CDC)  
+- Need **replay** of history  
+- Multiple independent consumers on one topic  
+- Per-partition ordering matters
 
 ```
 Producer → Topic(partitions) → Consumer Groups
 ```
 
 ::: tip
-Kafka بیشتر «دفترکل رویداد» است تا «صف کار کلاسیک».
+Kafka is more of an “event ledger” than a classic work queue.
 :::
 
 ---
 
-## RabbitMQ — چه وقت؟
+## RabbitMQ — when?
 
-- صف کار (job) با routing پیچیده (topic/fanout/headers)  
-- اولویت، TTL، delayed message  
-- پروتکل‌های متنوع (AMQP)  
-- الگوهای request/reply
+- Job queues with rich routing (topic/fanout/headers)  
+- Priority, TTL, delayed messages  
+- Diverse protocols (AMQP)  
+- Request/reply patterns
 
 ```
 Producer → Exchange → Queue → Consumer
@@ -50,42 +50,42 @@ Producer → Exchange → Queue → Consumer
 
 ---
 
-## Redis Streams — چه وقت؟
+## Redis Streams — when?
 
-- از قبل Redis در استک هست  
-- نیاز به consumer group ساده  
-- latency پایین، مقیاس متوسط  
-- نمی‌خواهی کلاستر Kafka راه بیندازی
+- Redis is already in the stack  
+- You need simple consumer groups  
+- Low latency at moderate scale  
+- You don’t want to operate a Kafka cluster
 
 ```
 XADD → Stream → XREADGROUP
 ```
 
-محدودیت: persistence/ops را با Kafka یکی فرض نکن؛ Redis را درست HA کن.
+Limitation: don’t assume Kafka-level durability/ops; HA Redis properly.
 
 ---
 
-## جدول تصمیم کوتاه
+## Short decision table
 
-| نیاز تو | پیشنهاد اولیه |
-|---------|----------------|
-| Event sourcing / analytics سنگین | Kafka |
-| Job queue + routing غنی | RabbitMQ |
-| صف سبک کنار cache موجود | Redis Streams |
-| فقط «بعداً یک job اجرا شود» در Laravel | گاهی Redis queue / database queue کافی است |
-
----
-
-## ضدالگو
-
-- آوردن Kafka برای روزی ۱۰۰۰ پیام  
-- استفاده از Redis Streams به‌جای سیستم مالی بدون درک durability  
-- یک broker برای همه چیز بدون SLO مشخص
+| Your need | First pick |
+|-----------|------------|
+| Event sourcing / heavy analytics | Kafka |
+| Job queue + rich routing | RabbitMQ |
+| Light queue next to existing cache | Redis Streams |
+| “Run a job later” in Laravel | Sometimes Redis/database queue is enough |
 
 ---
 
-## قانون تصمیم
+## Antipatterns
 
-1. حجم + retention + replay را بنویس.  
-2. پیچیدگی عملیاتی تیم را صادقانه بسنج.  
-3. از ساده‌ترین ابزاری شروع کن که SLO را می‌دهد؛ بعداً upgrade کن.
+- Bringing Kafka for 1,000 messages/day  
+- Using Redis Streams for financial systems without understanding durability  
+- One broker for everything with no SLOs
+
+---
+
+## Decision rule
+
+1. Write down volume + retention + replay needs.  
+2. Be honest about team ops complexity.  
+3. Start with the simplest tool that meets the SLO; upgrade later.

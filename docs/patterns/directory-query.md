@@ -1,8 +1,8 @@
 # Directory Query Class
 
-## مسئله
+## The problem
 
-وقتی فیلترها زیاد می‌شوند، controller یا repository پر از شرط می‌شود:
+When filters multiply, controllers or repositories fill with conditionals:
 
 ```php
 if ($request->status) { ... }
@@ -10,23 +10,23 @@ if ($request->from) { ... }
 if ($request->q) { ... }
 ```
 
-این الگو، **ساخت query** را در یک کلاس مشخص جمع می‌کند — مثل «دفترچهٔ راهنمای فیلترها».
+This pattern gathers **query construction** into one dedicated class — a single “directory” of filters.
 
 ---
 
-## ایده
+## Idea
 
-یک کلاس که:
+A class that:
 
-1. پارامترهای ورودی را می‌گیرد.  
-2. روی یک Query Builder پایه اعمال می‌کند.  
-3. نتیجهٔ آمادهٔ اجرا برمی‌گرداند.
+1. Accepts input parameters.  
+2. Applies them to a base Query Builder.  
+3. Returns something ready to execute.
 
-نام‌های رایج: `OrderQuery`, `UserDirectory`, `FilterBuilder`.
+Common names: `OrderQuery`, `UserDirectory`, `FilterBuilder`.
 
 ---
 
-## مثال PHP / Laravel
+## PHP / Laravel example
 
 ```php
 final class UserDirectoryQuery
@@ -60,7 +60,7 @@ final class UserDirectoryQuery
     }
 }
 
-// استفاده
+// Usage
 $users = UserDirectoryQuery::fromRequest($request->all())
     ->apply(User::query())
     ->paginate(20);
@@ -68,32 +68,32 @@ $users = UserDirectoryQuery::fromRequest($request->all())
 
 ---
 
-## چرا مفید است؟
+## Why it helps
 
-| بدون Query Class | با Query Class |
-|------------------|----------------|
-| منطق فیلتر پخش در چند جا | یک منبع حقیقت |
-| تست سخت | تست واحد روی فیلترها آسان |
-| تکرار شرط‌ها | reuse در API، CLI، job |
-
----
-
-## ارتباط با CQRS
-
-در سمت **Query**، Directory/Query Class دقیقاً همان «خواندن با فیلتر» را تمیز نگه می‌دارد و با Commandها قاطی نمی‌شود.
+| Without Query Class | With Query Class |
+|---------------------|------------------|
+| Filter logic scattered | One source of truth |
+| Hard to test | Unit-test filters easily |
+| Repeated conditions | Reuse in API, CLI, jobs |
 
 ---
 
-## ضدالگو
+## Relation to CQRS
 
-- تبدیل شدن به God Object با ۵۰ فیلتر نامرتبط  
-- SQL خام خطرناک داخل کلاس بدون parameter binding  
-- قاطی کردن side-effect (مثل ارسال ایمیل) داخل query class
+On the **Query** side, a Directory/Query Class keeps “read with filters” clean and out of Command handlers.
 
 ---
 
-## قانون تصمیم
+## Antipatterns
 
-1. اگر بیش از ۲–۳ فیلتر تکرارشونده داری → Query Class بساز.  
-2. فقط **خواندن/فیلتر**؛ نوشتن را جدا نگه دار.  
-3. نام کلاس را از دامنه بگیر (`OrderDirectory`)، نه `QueryHelper`.
+- Becoming a God Object with 50 unrelated filters  
+- Unsafe raw SQL without parameter binding  
+- Side effects (sending email) inside a query class
+
+---
+
+## Decision rule
+
+1. More than 2–3 recurring filters → build a Query Class.  
+2. **Read/filter only**; keep writes elsewhere.  
+3. Name from the domain (`OrderDirectory`), not `QueryHelper`.

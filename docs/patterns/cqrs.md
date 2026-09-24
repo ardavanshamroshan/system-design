@@ -1,34 +1,34 @@
-# CQRS و الگوهای سبک نرم‌افزار
+# CQRS & Light Software Patterns
 
-## CQRS چیست؟
+## What is CQRS?
 
 **CQRS** = *Command Query Responsibility Segregation*  
-یعنی **نوشتن (Command)** و **خواندن (Query)** را از هم جدا می‌کنی.
+You separate **writes (Commands)** from **reads (Queries)**.
 
-| طرف | نقش | مثال |
-|-----|-----|------|
-| Command | تغییر state | `CreateOrder`, `CancelPayment` |
-| Query | فقط خواندن | `GetOrderById`, `ListUserOrders` |
+| Side | Role | Example |
+|------|------|---------|
+| Command | Change state | `CreateOrder`, `CancelPayment` |
+| Query | Read only | `GetOrderById`, `ListUserOrders` |
 
-در نسخهٔ **سبک (light)** لازم نیست دو دیتابیس جدا داشته باشی. کافی است مدل‌ها، سرویس‌ها یا حتی جدول‌های read/write را از هم جدا کنی.
-
----
-
-## چرا؟
-
-در سیستم‌های واقعی:
-
-- مسیر write قوانین سخت دارد (validation، concurrency، side-effect).  
-- مسیر read اغلب denormalized، cache‌شده و سریع می‌خواهد باشد.
-
-یک مدل واحد برای هر دو → یا write پیچیده می‌شود، یا read کند.
+In the **light** version you don’t need two databases. It’s enough to separate models, services, or even read/write tables.
 
 ---
 
-## نسخهٔ سبک در عمل (Laravel/PHP)
+## Why?
+
+In real systems:
+
+- The write path has hard rules (validation, concurrency, side effects).  
+- The read path often wants denormalized, cached, fast views.
+
+One model for both → either writes get messy, or reads get slow.
+
+---
+
+## Light version in practice (Laravel/PHP)
 
 ```php
-// Command — تغییر می‌دهد
+// Command — mutates state
 final class PlaceOrder
 {
     public function __construct(
@@ -46,7 +46,7 @@ final class PlaceOrderHandler
     }
 }
 
-// Query — فقط می‌خواند
+// Query — reads only
 final class GetOrderQuery
 {
     public function __construct(public readonly string $orderId) {}
@@ -63,50 +63,50 @@ final class GetOrderHandler
 }
 ```
 
-::: tip نکته
-در CQRS سبک، هر دو می‌توانند همان MySQL را ببینند؛ فقط **کد و مدل ذهنی** جداست. Event Sourcing اجباری نیست.
+::: tip Note
+In light CQRS both sides can share the same MySQL; only the **code and mental model** are split. Event Sourcing is optional.
 :::
 
 ---
 
-## الگوها و پروتکل‌های مرتبط
+## Related patterns and protocols
 
-| مفهوم | نقش کوتاه |
-|-------|-----------|
-| **DTO** | شکل داده بین لایه‌ها |
-| **Repository** | abstraction روی persistence |
-| **Specification** | قوانین فیلتر/جستجو قابل ترکیب |
-| **Protocol / Interface** | قرارداد بین سرویس‌ها (نه implementation) |
-| **Data structure مناسب** | مثلاً map برای lookup، queue برای کارها |
+| Concept | Short role |
+|---------|------------|
+| **DTO** | Data shape between layers |
+| **Repository** | Abstraction over persistence |
+| **Specification** | Composable filter/search rules |
+| **Protocol / Interface** | Contract between services (not implementation) |
+| **Right data structure** | e.g. map for lookup, queue for work |
 
 ---
 
-## Data Structure — انتخاب سریع
+## Data structures — quick picks
 
-| نیاز | ساختار |
-|------|--------|
-| دسترسی با کلید | HashMap / associative array |
-| FIFO کارها | Queue |
+| Need | Structure |
+|------|-----------|
+| Access by key | HashMap / associative array |
+| FIFO work | Queue |
 | LIFO / undo | Stack |
-| ترتیب + uniqueness | TreeSet / sorted set |
-| گراف وابستگی | Graph / adjacency list |
+| Order + uniqueness | TreeSet / sorted set |
+| Dependency graph | Graph / adjacency list |
 
-انتخاب اشتباه ساختار → پیچیدگی الگوریتمی بد، حتی با کد تمیز.
-
----
-
-## Trade-off
-
-| مزیت | هزینه |
-|------|-------|
-| scale جدا برای read/write | پیچیدگی بیشتر کد |
-| مدل read بهینه | احتمال inconsistency کوتاه‌مدت |
-| تست‌پذیری بهتر | boilerplate بیشتر |
+Wrong structure → bad algorithmic complexity even with clean code.
 
 ---
 
-## قانون تصمیم
+## Trade-offs
 
-1. اگر read و write نیازهای متفاوت دارند → CQRS سبک را در نظر بگیر.  
-2. اگر سیستم کوچک و CRUD ساده است → یک مدل کافی است؛ over-engineer نکن.  
-3. اول **جداسازی کد**، بعد در صورت نیاز **جداسازی ذخیره‌سازی**.
+| Upside | Cost |
+|--------|------|
+| Scale read/write separately | More code complexity |
+| Optimized read models | Short-lived inconsistency possible |
+| Better testability | More boilerplate |
+
+---
+
+## Decision rule
+
+1. If read and write needs diverge → consider light CQRS.  
+2. If the system is small CRUD → one model is fine; don’t over-engineer.  
+3. Split **code first**, then storage only if needed.

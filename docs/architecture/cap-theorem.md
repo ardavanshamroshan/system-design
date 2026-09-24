@@ -1,74 +1,74 @@
 # CAP Theorem
 
-## جملهٔ اصلی
+## The core statement
 
-در یک **سیستم توزیع‌شده**، وقتی partition رخ می‌دهد، نمی‌توانی همزمان هر سه را ۱۰۰٪ داشته باشی:
+In a **distributed system**, when a partition happens, you cannot have all three at 100%:
 
-| حرف | معنی |
-|-----|------|
-| **C** Consistency | همهٔ نودها همان دادهٔ به‌روز را می‌بینند |
-| **A** Availability | هر درخواستِ غیرخطا، پاسخ می‌گیرد |
-| **P** Partition tolerance | سیستم با قطعی شبکه بین نودها زنده می‌ماند |
+| Letter | Meaning |
+|--------|---------|
+| **C** Consistency | Every node sees the same up-to-date data |
+| **A** Availability | Every non-failing request gets a response |
+| **P** Partition tolerance | The system keeps working despite network splits |
 
-در عمل شبکه fail می‌شود → **P تقریباً اجباری است**. پس انتخاب واقعی اغلب بین **CP** و **AP** است.
-
----
-
-## مدل ذهنی
-
-فرض کن دو دیتاسنتر داری و لینک بین آن‌ها قطع شده (partition):
-
-```
-[Node A]  ⚡ قطع  [Node B]
- کاربرها هنوز به هر دو وصل‌اند
-```
-
-- اگر فقط وقتی همهٔ نودها همگام‌اند جواب بدهی → **Consistency** را نگه می‌داری، Availability را قربانی می‌کنی (**CP**).  
-- اگر هر نود با دادهٔ محلی جواب بدهد → **Availability** حفظ می‌شود، ممکن است جواب‌ها فرق کند (**AP**).
+In practice the network fails → **P is nearly mandatory**. The real choice is usually between **CP** and **AP**.
 
 ---
 
-## مثال‌های تقریبی
+## Mental model
 
-| سیستم | گرایش رایج | توضیح کوتاه |
-|-------|------------|-------------|
-| PostgreSQL primary + sync replica | CP-ish | روی partition ممکن است write متوقف شود |
-| Cassandra / Dynamo-style | AP-ish | همیشه write می‌پذیرد؛ بعداً reconcile |
-| ZooKeeper / etcd | CP | برای coordination؛ بدون quorum جواب نمی‌دهد |
-| Redis Cluster | وابسته به تنظیم | با دقت بخوان؛ ساده‌سازی نکن |
+Two data centers, link between them is down (partition):
+
+```
+[Node A]  ⚡ cut  [Node B]
+ Users still hit both
+```
+
+- Answer only when nodes are in sync → keep **Consistency**, sacrifice Availability (**CP**).  
+- Each node answers from local data → keep **Availability**, answers may diverge (**AP**).
+
+---
+
+## Rough examples
+
+| System | Common lean | Short note |
+|--------|-------------|------------|
+| PostgreSQL primary + sync replica | CP-ish | Writes may stop on partition |
+| Cassandra / Dynamo-style | AP-ish | Accepts writes; reconciles later |
+| ZooKeeper / etcd | CP | Coordination; no quorum → no answer |
+| Redis Cluster | Depends on config | Don’t oversimplify — read the docs |
 
 ::: warning
-برچسب CAP روی محصولات بازاریابی است؛ جزئیات quorum، replication و client behavior را بخوان.
+CAP labels on marketing pages are sloppy; check quorum, replication, and client behavior.
 :::
 
 ---
 
-## Consistency طیف است
+## Consistency is a spectrum
 
-CAP با «strong vs eventual consistency» قاطی می‌شود ولی یکی نیستند:
+CAP gets mixed with “strong vs eventual consistency,” but they aren’t identical:
 
-- **Strong:** بعد از write موفق، همهٔ read همان را می‌بینند.  
-- **Eventual:** اگر write جدید نیاید، بالاخره همگرا می‌شوند.  
-- **Read-your-writes / Causal:** تضمین‌های میانی برای UX بهتر.
-
----
-
-## در طراحی سیستم چه بپرسیم؟
-
-1. اگر دو کاربر همزمان موجودی کیف پول را ببینند و یکی اشتباه باشد، قابل قبول است؟  
-2. اگر برای ۳۰ ثانیه checkout قطع شود، کسب‌وکار می‌میرد؟  
-3. partition چقدر محتمل است (یک DC در مقابل multi-region)؟
-
-| ترجیح کسب‌وکار | انتخاب تقریبی |
-|----------------|----------------|
-| پول، موجودی، رزرو صندلی | تمایل به CP / strong consistency |
-| لایک، فید، شمارندهٔ تقریبی | تمایل به AP / eventual |
-| Config توزیع‌شده | معمولاً CP |
+- **Strong:** after a successful write, every read sees it.  
+- **Eventual:** if writes stop, replicas converge.  
+- **Read-your-writes / Causal:** mid-tier guarantees for better UX.
 
 ---
 
-## قانون تصمیم
+## What to ask in design
 
-1. اول **معنای اشتباه بودن داده** را بفهم، بعد ابزار انتخاب کن.  
-2. «ما هم C هم A می‌خواهیم» بدون تعریف partition → شعار است.  
-3. خیلی سیستم‌ها در حالت عادی CA به‌نظر می‌رسند؛ تست واقعی در partition است.
+1. If two users see different wallet balances, is that acceptable?  
+2. If checkout is down for 30 seconds, does the business die?  
+3. How likely are partitions (one DC vs multi-region)?
+
+| Business preference | Approximate choice |
+|---------------------|--------------------|
+| Money, inventory, seat booking | Lean CP / strong consistency |
+| Likes, feeds, approximate counters | Lean AP / eventual |
+| Distributed config | Usually CP |
+
+---
+
+## Decision rule
+
+1. First understand what **wrong data** means, then pick tools.  
+2. “We want both C and A” without defining partition → marketing.  
+3. Many systems look CA in the happy path; the real test is partition.

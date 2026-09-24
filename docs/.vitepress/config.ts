@@ -1,9 +1,9 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  lang: 'fa-IR',
+  lang: 'en-US',
   title: 'System Design',
-  description: 'مستندات طراحی سیستم و معماری نرم‌افزار',
+  description: 'System design and software architecture documentation',
   base: '/system-design/',
   cleanUrls: true,
   lastUpdated: true,
@@ -25,24 +25,14 @@ export default defineConfig({
     logo: { light: '/logo.svg', dark: '/logo.svg' },
     siteTitle: 'System Design',
     outline: {
-      label: 'در این صفحه',
+      label: 'On this page',
       level: [2, 3],
     },
     search: {
       provider: 'local',
-      options: {
-        translations: {
-          button: { buttonText: 'جستجو', buttonAriaLabel: 'جستجو' },
-          modal: {
-            noResultsText: 'نتیجه‌ای پیدا نشد',
-            resetButtonTitle: 'پاک کردن',
-            footer: { selectText: 'انتخاب', navigateText: 'پیمایش', closeText: 'بستن' },
-          },
-        },
-      },
     },
     nav: [
-      { text: 'مستندات', link: '/fundamentals/big-o' },
+      { text: 'Docs', link: '/fundamentals/big-o' },
       { text: 'GitHub', link: 'https://github.com/ardavanshamroshan/system-design' },
     ],
     socialLinks: [
@@ -50,30 +40,30 @@ export default defineConfig({
     ],
     sidebar: [
       {
-        text: 'مقدمات و الگوریتم',
+        text: 'Fundamentals & Algorithms',
         items: [
           { text: 'Big O Notation', link: '/fundamentals/big-o' },
-          { text: 'Quick Sort و Binary Search', link: '/fundamentals/sorting-search' },
+          { text: 'Quick Sort & Binary Search', link: '/fundamentals/sorting-search' },
         ],
       },
       {
-        text: 'الگوهای نرم‌افزاری',
+        text: 'Software Patterns',
         items: [
-          { text: 'CQRS و الگوهای سبک', link: '/patterns/cqrs' },
+          { text: 'CQRS & Light Patterns', link: '/patterns/cqrs' },
           { text: 'Directory Query Class', link: '/patterns/directory-query' },
           { text: 'Cache Aside / Read-Write Through', link: '/patterns/cache-patterns' },
           { text: 'Outbox Pattern', link: '/patterns/outbox' },
         ],
       },
       {
-        text: 'معماری سیستم',
+        text: 'System Architecture',
         items: [
           { text: 'API Gateway', link: '/architecture/api-gateway' },
           { text: 'CAP Theorem', link: '/architecture/cap-theorem' },
         ],
       },
       {
-        text: 'پیام‌رسانی',
+        text: 'Messaging',
         items: [
           { text: 'Dead-Letter Queue (DLQ)', link: '/messaging/dlq' },
           { text: 'Kafka / RabbitMQ / Redis Streams', link: '/messaging/brokers' },
@@ -81,7 +71,7 @@ export default defineConfig({
         ],
       },
       {
-        text: 'پایگاه داده',
+        text: 'Database',
         items: [
           { text: 'Connection Pooling', link: '/database/connection-pool' },
           { text: 'Optimistic vs Pessimistic Locking', link: '/database/locking' },
@@ -96,16 +86,7 @@ export default defineConfig({
     ],
     footer: {
       message: 'System Design & Software Architecture',
-      copyright: 'مستندات آموزشی — آزاد برای یادگیری و اشتراک',
+      copyright: 'Educational docs — free to learn and share',
     },
-    docFooter: {
-      prev: 'قبلی',
-      next: 'بعدی',
-    },
-    darkModeSwitchLabel: 'تم',
-    lightModeSwitchTitle: 'حالت روشن',
-    darkModeSwitchTitle: 'حالت تاریک',
-    sidebarMenuLabel: 'منو',
-    returnToTopLabel: 'بازگشت به بالا',
   },
 })

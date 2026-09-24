@@ -1,28 +1,28 @@
-# Cache Aside، Read-Through و Write-Through
+# Cache Aside, Read-Through & Write-Through
 
-## چرا Cache؟
+## Why cache?
 
-دیتابیس گران و کندتر از حافظه است. Cache لایهٔ سریع جلوی دادهٔ پرتکرار می‌گذارد.
+Databases are more expensive and slower than memory. A cache sits in front of hot data.
 
-سه الگوی کلاسیک:
+Three classic patterns:
 
-| الگو | خواندن | نوشتن |
-|------|--------|-------|
-| **Cache-Aside** | اپلیکیشن مسئول | اپلیکیشن مسئول |
-| **Read-Through** | cache lib مسئول | معمولاً جدا |
-| **Write-Through** | — | همزمان cache + DB |
+| Pattern | Reads | Writes |
+|---------|-------|--------|
+| **Cache-Aside** | App is responsible | App is responsible |
+| **Read-Through** | Cache layer loads | Usually separate |
+| **Write-Through** | — | Cache + DB together |
 
 ---
 
-## Cache-Aside (Lazy Loading)
+## Cache-Aside (lazy loading)
 
-رایج‌ترین الگو در وب‌اپ‌ها:
+Most common in web apps:
 
 ```
-1. بخوان از cache
-2. اگر miss → بخوان از DB
-3. بنویس داخل cache
-4. برگردان به کلاینت
+1. Read from cache
+2. On miss → read from DB
+3. Write into cache
+4. Return to client
 ```
 
 ```php
@@ -41,7 +41,7 @@ function getUser(string $id): array
 }
 ```
 
-### هنگام Update
+### On update
 
 ```php
 function updateUser(string $id, array $data): void
@@ -52,64 +52,64 @@ function updateUser(string $id, array $data): void
 ```
 
 ::: tip
-Invalidate ساده‌تر از update کردن cache است و کمتر stale می‌ماند اشتباه.
+Invalidation is simpler than updating the cache entry and tends to leave less stale data when done wrong.
 :::
 
 ---
 
 ## Read-Through
 
-کلاینت فقط با cache حرف می‌زند. اگر miss شود، **خودِ لایهٔ cache** از DB می‌خواند و پر می‌کند.
+The client only talks to the cache. On miss, the **cache layer itself** loads from the DB and fills itself.
 
 ```
 App → Cache → (miss) → DB → Cache → App
 ```
 
-مزیت: منطق miss در یک جا.  
-هزینه: نیاز به cache provider که loader داشته باشد.
+Upside: miss logic lives in one place.  
+Cost: you need a cache provider that supports a loader.
 
 ---
 
 ## Write-Through
 
-هر write همزمان به **cache و DB** می‌رود.
+Every write goes to **cache and DB** together.
 
 ```
-App → Cache + DB (با هم)
+App → Cache + DB (together)
 ```
 
-| مزیت | هزینه |
-|------|-------|
-| cache همیشه تازه | latency بیشتر روی write |
-| miss کمتر بعد از write | اگر cache down شود، پیچیده‌تر |
+| Upside | Cost |
+|--------|------|
+| Cache stays fresh | Higher write latency |
+| Fewer misses after writes | Harder if the cache is down |
 
-نزدیک: **Write-Behind** — اول cache، بعد async به DB (سریع‌تر، خطر از دست رفتن داده).
-
----
-
-## مقایسهٔ سریع
-
-| معیار | Cache-Aside | Read-Through | Write-Through |
-|-------|-------------|--------------|---------------|
-| کنترل اپ | زیاد | کمتر | متوسط |
-| پیچیدگی | کم | متوسط | متوسط |
-| تازگی داده | وابسته به invalidate | خوب روی read | خوب روی write |
-| استفاده رایج | Redis + Laravel | CDN / libهای ORM cache | session / config store |
+Related: **Write-Behind** — write cache first, flush to DB async (faster, risk of data loss).
 
 ---
 
-## ضدالگو
+## Quick comparison
 
-- TTL خیلی بلند بدون invalidate → دادهٔ کهنه  
-- cache کردن نتیجهٔ queryهای شخصی‌سازی‌شده بدون کلید درست  
-- stampede: هزار درخواست همزمان بعد از expire یک کلید
-
-برای stampede: lock کوتاه، soft TTL، یا probabilistic early expiration.
+| Criterion | Cache-Aside | Read-Through | Write-Through |
+|-----------|-------------|--------------|---------------|
+| App control | High | Lower | Medium |
+| Complexity | Low | Medium | Medium |
+| Freshness | Depends on invalidate | Good on read | Good on write |
+| Common use | Redis + Laravel | CDN / ORM cache libs | Session / config stores |
 
 ---
 
-## قانون تصمیم
+## Antipatterns
 
-1. بیشتر APIهای CRUD → **Cache-Aside + invalidate**.  
-2. اگر می‌خواهی app از loader بی‌خبر باشد → Read-Through.  
-3. اگر consistency روی write حیاتی است → Write-Through (یا اصلاً cache نکن).
+- Very long TTL without invalidate → stale data  
+- Caching personalized query results with bad keys  
+- Stampede: thousands of requests after one key expires
+
+For stampedes: short lock, soft TTL, or probabilistic early expiration.
+
+---
+
+## Decision rule
+
+1. Most CRUD APIs → **Cache-Aside + invalidate**.  
+2. If the app shouldn’t know about loaders → Read-Through.  
+3. If write consistency is critical → Write-Through (or don’t cache).

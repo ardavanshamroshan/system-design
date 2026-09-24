@@ -1,26 +1,26 @@
-# Quick Sort و Binary Search
+# Quick Sort & Binary Search
 
-## چرا این دو؟
+## Why these two?
 
-در مصاحبه و طراحی سیستم، دو ابزار پایه زیاد تکرار می‌شوند:
+In interviews and system design, two basics show up constantly:
 
-| الگوریتم | کار | پیچیدگی متوسط |
-|----------|-----|----------------|
-| **Binary Search** | پیدا کردن در دادهٔ **مرتب** | O(log n) |
-| **Quick Sort** | مرتب‌سازی با تقسیم و غلبه | O(n log n) |
+| Algorithm | Job | Average complexity |
+|-----------|-----|--------------------|
+| **Binary Search** | Find in **sorted** data | O(log n) |
+| **Quick Sort** | Sort via divide and conquer | O(n log n) |
 
-بدون درک این‌ها، بحث ایندکس دیتابیس، range query و مقیاس‌پذیری ناقص می‌ماند.
+Without them, conversations about DB indexes, range queries, and scalability stay incomplete.
 
 ---
 
-## Binary Search — ایده
+## Binary Search — idea
 
-آرایه باید **مرتب** باشد. هر بار نصف فضای جستجو را حذف می‌کنی.
+The array must be **sorted**. Each step discards half the search space.
 
 ```
-[1, 3, 5, 7, 9, 11, 13]  هدف = 11
- mid → 7  → برو راست
- mid → 11 → پیدا شد
+[1, 3, 5, 7, 9, 11, 13]  target = 11
+ mid → 7  → go right
+ mid → 11 → found
 ```
 
 ### PHP
@@ -47,41 +47,41 @@ function binarySearch(array $sorted, int $target): int
 }
 ```
 
-### نکته‌های سیستم
+### Systems notes
 
-- B-Tree / ایندکس دیتابیس عملاً جستجوی لگاریتمی است.
-- اگر داده مرتب نیست، اول sort کن (هزینهٔ یک‌باره) یا از hash استفاده کن.
-- برای دادهٔ پویا و زیاد، ساختارهای درخت/ایندکس بهتر از sort مکرر هستند.
+- B-Trees / database indexes are effectively logarithmic search.
+- If data isn’t sorted, sort once (one-time cost) or use a hash.
+- For large, dynamic data, tree/index structures beat repeated full sorts.
 
 ---
 
-## Quick Sort — ایده
+## Quick Sort — idea
 
-1. یک **pivot** انتخاب کن.  
-2. عناصر کوچک‌تر را چپ، بزرگ‌تر را راست بگذار (partition).  
-3. روی دو نیمهٔ بازگشتی تکرار کن.
+1. Pick a **pivot**.  
+2. Partition: smaller left, larger right.  
+3. Recurse on both sides.
 
 ```
 [5, 2, 8, 1, 9]  pivot=5
 → [2, 1] + [5] + [8, 9]
-→ مرتب کن نیمه‌ها
+→ sort the halves
 ```
 
-### پیچیدگی
+### Complexity
 
-| حالت | زمان | توضیح |
+| Case | Time | Notes |
 |------|------|-------|
-| متوسط | O(n log n) | pivot خوب |
-| بدترین | O(n²) | دادهٔ از قبل مرتب + pivot همیشه اول/آخر |
-| حافظه | O(log n) | عمق recursion (متوسط) |
+| Average | O(n log n) | Good pivots |
+| Worst | O(n²) | Already sorted + always first/last pivot |
+| Memory | O(log n) | Recursion depth (average) |
 
-::: tip جلوگیری از worst case
-- pivot تصادفی  
-- یا median-of-three  
-- برای پایداری قطعی: mergesort / heapsort
+::: tip Avoiding worst case
+- Random pivot  
+- Or median-of-three  
+- For guaranteed bounds: mergesort / heapsort
 :::
 
-### PHP (مفهومی)
+### PHP (conceptual)
 
 ```php
 function quickSort(array $arr): array
@@ -105,31 +105,31 @@ function quickSort(array $arr): array
 }
 ```
 
-(نسخهٔ in-place در production بهتر است؛ این نسخه برای فهم partition است.)
+(In-place versions are better in production; this one is for understanding partition.)
 
 ---
 
-## مقایسهٔ سریع با ساختارهای واقعی
+## Quick compare with real structures
 
-| نیاز | ابزار رایج |
-|------|------------|
-| lookup با کلید دقیق | Hash / Map → O(1) متوسط |
-| جستجو در بازه / مرتب | ایندکس B-Tree → ~O(log n) |
-| مرتب‌سازی یک‌باره در حافظه | sort زبان / quicksort |
-| داده‌های خیلی بزرگ روی دیسک | merge-based / external sort |
-
----
-
-## قانون تصمیم
-
-1. اگر داده **مرتب** است و فقط جستجو می‌خواهی → Binary Search / ایندکس.  
-2. اگر باید مرتب شود و n بزرگ است → الگوریتم O(n log n)، نه حبابی O(n²).  
-3. اگر فقط lookup با کلید داری → hash معمولاً از sort+binary بهتر است.
+| Need | Common tool |
+|------|-------------|
+| Exact key lookup | Hash / Map → average O(1) |
+| Range / ordered search | B-Tree index → ~O(log n) |
+| One-shot in-memory sort | Language sort / quicksort |
+| Huge on-disk datasets | Merge-based / external sort |
 
 ---
 
-## تمرین
+## Decision rule
 
-1. چرا binary search روی لیست لینک‌دار معمولاً بی‌فایده است؟  
-2. اگر pivot همیشه کوچک‌ترین عنصر باشد، Quick Sort چه می‌شود؟  
-3. ایندکس MySQL روی ستون `email` به کدام ایده نزدیک‌تر است؟
+1. Data is **sorted** and you only need search → Binary Search / index.  
+2. You must sort and `n` is large → O(n log n), not bubble O(n²).  
+3. Exact key lookup only → hash usually beats sort + binary search.
+
+---
+
+## Practice
+
+1. Why is binary search usually pointless on a linked list?  
+2. If the pivot is always the smallest element, what happens to Quick Sort?  
+3. A MySQL index on `email` is closest to which idea?

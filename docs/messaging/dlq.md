@@ -1,11 +1,11 @@
 # Dead-Letter Queue (DLQ) Explained
 
-## چیست؟
+## What is it?
 
-وقتی پیامی **چندبار مصرف می‌شود و همیشه fail** می‌کند، آن را به صف جداگانه‌ای به نام **Dead-Letter Queue** می‌فرستی تا:
+When a message **fails to process repeatedly**, you send it to a separate queue called a **Dead-Letter Queue** so that:
 
-- صف اصلی را مسدود نکند  
-- برای بررسی، هشدار و replay نگه داشته شود  
+- It doesn’t block the main queue  
+- You can alert, inspect, and replay it  
 
 ```
 [Main Queue] --fail x N--> [DLQ] --> alert / manual replay
@@ -13,36 +13,36 @@
 
 ---
 
-## چرا لازم است؟
+## Why you need it
 
-بدون DLQ:
+Without a DLQ:
 
-- پیام poison بارها retry می‌شود  
-- consumerها مشغول می‌مانند  
-- پیام‌های سالم پشت سر می‌مانند  
+- Poison messages retry forever  
+- Consumers stay busy  
+- Healthy messages pile up behind them  
 
-با DLQ: شکست‌ها ایزوله می‌شوند.
-
----
-
-## سناریوهای رایج fail
-
-| نوع | مثال |
-|-----|------|
-| دادهٔ نامعتبر | JSON خراب، فیلد اجباری نیست |
-| باگ منطق | null pointer مکرر |
-| وابستگی down | پرداخت‌یار موقتاً 500 می‌دهد |
-| poison message | یک پیام خاص همیشه می‌ترکاند |
-
-برای خطای موقتی → retry با backoff.  
-برای خطای دائمی → بعد از N بار → DLQ.
+With a DLQ: failures are isolated.
 
 ---
 
-## پیکربندی مفهومی
+## Common failure scenarios
+
+| Type | Example |
+|------|---------|
+| Invalid data | Broken JSON, missing required field |
+| Logic bug | Repeated null pointer |
+| Dependency down | Payment provider returns 500 temporarily |
+| Poison message | One specific payload always crashes |
+
+Temporary errors → retry with backoff.  
+Permanent errors → after N attempts → DLQ.
+
+---
+
+## Conceptual config
 
 ```yaml
-# مثال ذهنی (RabbitMQ / SQS-like)
+# Mental example (RabbitMQ / SQS-like)
 max_receive_count: 5
 dead_letter_queue: orders.dlq
 retry_backoff: exponential
@@ -61,26 +61,26 @@ try {
 
 ---
 
-## بعد از رسیدن به DLQ چه کنیم؟
+## After a message hits the DLQ
 
-1. **متریک و آلرت** روی عمق DLQ  
-2. لاگ correlation id / payload امن  
-3. Fix باگ یا داده  
-4. **Replay** کنترل‌شده به صف اصلی  
-5. اگر بی‌ارزش است → archive / drop با دلیل
-
----
-
-## ضدالگو
-
-- DLQ بدون مانیتورینگ (= سطل زبالهٔ فراموش‌شده)  
-- فرستادن همهٔ خطاها به DLQ از اولین fail (بدون retry)  
-- replay کور همهٔ پیام‌ها بدون idempotent consumer
+1. **Metrics and alerts** on DLQ depth  
+2. Log correlation id / safe payload  
+3. Fix the bug or data  
+4. **Replay** carefully to the main queue  
+5. If worthless → archive / drop with a reason
 
 ---
 
-## قانون تصمیم
+## Antipatterns
 
-1. هر صف production باید سیاست retry + DLQ داشته باشد.  
-2. موقتی ≠ دائمی؛ نوع exception را جدا کن.  
-3. DLQ را مثل «صف بیمارستانی» مانیتور کن، نه آرشیو خاموش.
+- DLQ with no monitoring (= forgotten trash can)  
+- Sending every error to DLQ on the first fail (no retries)  
+- Blind replay of everything without idempotent consumers
+
+---
+
+## Decision rule
+
+1. Every production queue needs a retry + DLQ policy.  
+2. Temporary ≠ permanent; separate exception types.  
+3. Treat the DLQ like a hospital ward — monitor it, don’t ignore it.

@@ -1,28 +1,28 @@
 # Outbox Pattern (Database as Message Broker)
 
-## مسئله
+## The problem
 
-می‌خواهی بعد از ذخیره در DB، یک پیام به Kafka/RabbitMQ بفرستی:
+You want to save to the DB, then publish to Kafka/RabbitMQ:
 
 ```php
 DB::transaction(function () {
     Order::create(...);
 });
-$bus->publish(new OrderCreated(...)); // اگر اینجا fail شود؟
+$bus->publish(new OrderCreated(...)); // what if this fails?
 ```
 
-اگر publish بعد از commit fail شود → رویداد از دست می‌رود.  
-اگر قبل از commit publish کنی و بعد rollback شود → رویداد دروغین.
+If publish fails after commit → the event is lost.  
+If you publish before commit and then roll back → a false event.
 
 ---
 
-## ایدهٔ Outbox
+## Outbox idea
 
-داخل **همان تراکنش دیتابیس**:
+Inside the **same database transaction**:
 
-1. دادهٔ اصلی را بنویس.  
-2. رویداد را در جدول `outbox` بنویس.  
-3. یک worker جدا ردیف‌های outbox را می‌خواند و به broker می‌فرستد.
+1. Write the domain row.  
+2. Write the event into an `outbox` table.  
+3. A separate worker reads outbox rows and publishes to the broker.
 
 ```
 [Service] --tx--> [orders] + [outbox]
@@ -30,11 +30,11 @@ $bus->publish(new OrderCreated(...)); // اگر اینجا fail شود؟
               [Relay Worker] --> [Kafka/RabbitMQ]
 ```
 
-دیتابیس موقتاً نقش «منبع حقیقت پیام» را بازی می‌کند.
+The database temporarily acts as the “source of truth” for messages.
 
 ---
 
-## اسکیمای ساده
+## Simple schema
 
 ```sql
 CREATE TABLE outbox (
@@ -64,7 +64,7 @@ DB::transaction(function () use ($order) {
 
 ---
 
-## Relay Worker
+## Relay worker
 
 ```php
 $batch = DB::table('outbox')
@@ -81,28 +81,28 @@ foreach ($batch as $row) {
 }
 ```
 
-بهتر: publishing با **idempotent consumer** و علامت‌گذاری امن (مثلاً `FOR UPDATE SKIP LOCKED`).
+Better: publish with **idempotent consumers** and safe claiming (e.g. `FOR UPDATE SKIP LOCKED`).
 
 ---
 
-## مزایا و هزینه‌ها
+## Pros and costs
 
-| مزیت | هزینه |
-|------|-------|
-| atomicity بین state و event | جدول outbox + worker |
-| بدون dual-write ناامن | تأخیر کوتاه تا publish |
-| ساده برای شروع | پاکسازی ردیف‌های قدیمی لازم است |
-
----
-
-## ارتباط با Inbox
-
-مصرف‌کننده می‌تواند جدول `inbox` داشته باشد تا همان event دو بار پردازش نشود (**at-least-once** + idempotency).
+| Upside | Cost |
+|--------|------|
+| Atomicity between state and event | Outbox table + worker |
+| No unsafe dual-write | Short delay until publish |
+| Simple to start | Need cleanup of old rows |
 
 ---
 
-## قانون تصمیم
+## Relation to Inbox
 
-1. اگر «DB + پیام» باید با هم درست باشند → Outbox.  
-2. اگر از دست رفتن گاه‌به‌گاه event قابل قبول است → شاید ساده publish کافی باشد (معمولاً نیست).  
-3. CDC (مثل Debezium) نسخهٔ پیشرفته‌تر همان ایده‌است.
+Consumers can keep an `inbox` table so the same event isn’t processed twice (**at-least-once** + idempotency).
+
+---
+
+## Decision rule
+
+1. If “DB + message” must succeed together → Outbox.  
+2. If occasional event loss is acceptable → plain publish might be enough (usually it isn’t).  
+3. CDC (e.g. Debezium) is a more advanced form of the same idea.

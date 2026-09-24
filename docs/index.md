@@ -3,23 +3,23 @@ layout: home
 
 hero:
   name: System Design
-  text: معماری نرم‌افزار و طراحی سیستم
-  tagline: الگوها، پروتکل‌ها، پیام‌رسانی، دیتابیس و الگوریتم — با زبانی ساده و کاربردی
+  text: Software architecture & system design
+  tagline: Patterns, protocols, messaging, databases, and algorithms — practical and clear
   actions:
     - theme: brand
-      text: شروع یادگیری
+      text: Get started
       link: /fundamentals/big-o
     - theme: alt
-      text: مشاهده در GitHub
+      text: View on GitHub
       link: https://github.com/ardavanshamroshan/system-design
 
 features:
-  - title: مقدمات و الگوریتم
-    details: Big O، Quick Sort و Binary Search — پایهٔ تفکر مقیاس‌پذیری
-  - title: الگوهای نرم‌افزاری
-    details: CQRS، Cache، Outbox و Directory Query
-  - title: معماری و پیام‌رسانی
-    details: API Gateway، CAP، DLQ، Kafka و Acknowledgment
-  - title: دیتابیس و DevOps
-    details: Connection Pool، Locking و Docker Compose Profiles
+  - title: Fundamentals & Algorithms
+    details: Big O, Quick Sort, and Binary Search — the language of scalability
+  - title: Software Patterns
+    details: CQRS, Cache, Outbox, and Directory Query
+  - title: Architecture & Messaging
+    details: API Gateway, CAP, DLQ, Kafka, and Acknowledgment
+  - title: Database & DevOps
+    details: Connection Pool, Locking, and Docker Compose Profiles
 ---
