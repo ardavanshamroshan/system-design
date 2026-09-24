@@ -117,16 +117,19 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Sticky header — Laravel sticky-nav (in-flow, not fixed overlay)            */
+/* Fixed header — VitePress default model (content padded below nav)          */
 /* -------------------------------------------------------------------------- */
 
 .Layout .VPNav {
-  position: sticky !important;
+  position: fixed !important;
   top: 0 !important;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 99;
   background: var(--color-sand-light-1) !important;
   border-bottom: 1px solid var(--color-sand-light-5);
-  pointer-events: auto;
+  pointer-events: none; /* children re-enable clicks (VitePress default) */
 }
 
 .dark .Layout .VPNav {
@@ -134,9 +137,22 @@
   border-bottom-color: var(--color-sand-dark-5);
 }
 
-/* Sticky nav occupies flow — drop VitePress fixed-nav top padding */
+/* Keep content clear of fixed header — home + docs */
 @media (min-width: 960px) {
-  .Layout .VPContent {
+  .Layout .VPContent,
+  .Layout .VPContent.is-home,
+  .Layout .VPContent.has-sidebar {
+    padding-top: var(--vp-nav-height) !important;
+  }
+}
+
+/* Mobile / tablet: nav is in-flow below 960px; still pad home a bit if fixed */
+@media (max-width: 959px) {
+  .Layout .VPNav {
+    position: relative !important;
+  }
+
+  .Layout .VPContent.is-home {
     padding-top: 0 !important;
   }
 }
@@ -145,6 +161,13 @@
   height: var(--vp-nav-height) !important;
   background: transparent !important;
   border-bottom: none !important;
+  pointer-events: none;
+}
+
+.VPNavBar .title,
+.VPNavBar .content,
+.VPNavBar .content-body > * {
+  pointer-events: auto;
 }
 
 .VPNavBar .container,
@@ -254,15 +277,21 @@
 
 @media (min-width: 960px) {
   .VPSidebar {
-    /* Sticky header is in-flow; sidebar fills viewport below it */
-    top: var(--vp-nav-height) !important;
-    padding-top: 0 !important;
+    /* Fixed nav: sidebar pads under header via curtain (VitePress model) */
+    top: var(--vp-layout-top-height, 0px) !important;
+    padding-top: var(--vp-nav-height) !important;
     width: var(--vp-sidebar-width) !important;
-    max-height: calc(100vh - var(--vp-nav-height)) !important;
+    max-height: none !important;
   }
 
   .VPSidebar .curtain {
-    display: none !important;
+    display: block !important;
+    background-color: var(--color-sand-light-1) !important;
+    height: var(--vp-nav-height) !important;
+  }
+
+  .dark .VPSidebar .curtain {
+    background-color: var(--color-sand-dark-1) !important;
   }
 }
 
