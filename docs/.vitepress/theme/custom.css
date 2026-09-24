@@ -712,8 +712,28 @@
   margin-bottom: 0 !important;
 }
 
+/*
+ * VitePress VPHero defaults:
+ *   margin-top: -nav-height  (pulls hero under fixed nav for full-bleed)
+ *   padding-top: nav-height + 48/80px  (pushes text back below nav)
+ * Our compact padding overrode only padding → hero sat under the header.
+ * Correct fix: cancel the pull-up; VPContent already pads for fixed nav.
+ */
 .VPHero.VPHomeHero {
-  padding: 2.75rem 0 1.25rem !important;
+  margin-top: 0 !important;
+  padding: 2.75rem 1.5rem 1.25rem !important;
+}
+
+@media (min-width: 640px) {
+  .VPHero.VPHomeHero {
+    padding: 2.75rem 3rem 1.25rem !important;
+  }
+}
+
+@media (min-width: 960px) {
+  .VPHero.VPHomeHero {
+    padding: 2.75rem 4rem 1.25rem !important;
+  }
 }
 
 .VPHero .container {
