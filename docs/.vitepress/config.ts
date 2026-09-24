@@ -1,23 +1,22 @@
 import { defineConfig } from 'vitepress'
 
+const base = '/system-design/'
+
 export default defineConfig({
   lang: 'en-US',
   title: 'System Design',
   description: 'System design and software architecture documentation',
-  base: '/system-design/',
+  base,
   cleanUrls: true,
   lastUpdated: true,
 
   head: [
-    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
-    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-    [
-      'link',
-      {
-        href: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap',
-        rel: 'stylesheet',
-      },
-    ],
+    // Self-hosted fonts (no Google Fonts CDN) — base must be explicit in head
+    ['link', { rel: 'stylesheet', href: `${base}fonts/fonts.css` }],
+    ['link', { rel: 'icon', href: `${base}favicon.svg`, type: 'image/svg+xml' }],
+    ['link', { rel: 'icon', href: `${base}favicon-32x32.png`, type: 'image/png', sizes: '32x32' }],
+    ['link', { rel: 'icon', href: `${base}favicon.ico`, sizes: 'any' }],
+    ['link', { rel: 'apple-touch-icon', href: `${base}apple-touch-icon.png` }],
     ['meta', { name: 'theme-color', content: '#f53003' }],
   ],
 

@@ -31,7 +31,10 @@
   --color-sand-dark-12: #eeeeec;
 
   --color-laravel-red: #f53003;
-  --color-code-bg: #292d3e;
+  /* Sand-aligned code chrome (replaces purple palenight panel) */
+  --color-code-bg: #1c1c1a;
+  --color-code-chrome: #111110;
+  --color-code-line-num: #6f6d66;
 
   --vp-c-brand-1: var(--color-laravel-red);
   --vp-c-brand-2: #c42602;
@@ -52,7 +55,7 @@
   --vp-c-text-3: var(--color-sand-light-9);
 
   --vp-font-family-base: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-  --vp-font-family-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --vp-font-family-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   --vp-nav-height: 4rem;
   --vp-sidebar-width: 260px;
@@ -60,7 +63,7 @@
   --vp-code-copy-code-bg: transparent;
   --vp-code-copy-code-hover-bg: color-mix(in oklab, #fff 8%, transparent);
   --vp-code-copy-code-border-color: transparent;
-  --vp-code-line-number-color: #4c5374;
+  --vp-code-line-number-color: var(--color-code-line-num);
   --vp-code-font-size: 13px;
   --vp-code-line-height: 1.7;
 
@@ -114,20 +117,28 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Sticky header — Laravel sticky-nav docs-nav                                */
+/* Sticky header — Laravel sticky-nav (in-flow, not fixed overlay)            */
 /* -------------------------------------------------------------------------- */
 
-.VPNav {
-  position: sticky;
-  top: 0;
+.Layout .VPNav {
+  position: sticky !important;
+  top: 0 !important;
   z-index: 99;
   background: var(--color-sand-light-1) !important;
   border-bottom: 1px solid var(--color-sand-light-5);
+  pointer-events: auto;
 }
 
-.dark .VPNav {
+.dark .Layout .VPNav {
   background: var(--color-sand-dark-1) !important;
   border-bottom-color: var(--color-sand-dark-5);
+}
+
+/* Sticky nav occupies flow — drop VitePress fixed-nav top padding */
+@media (min-width: 960px) {
+  .Layout .VPContent {
+    padding-top: 0 !important;
+  }
 }
 
 .VPNavBar {
@@ -243,20 +254,15 @@
 
 @media (min-width: 960px) {
   .VPSidebar {
-    /* Stick under layout-top; pad so items start below sticky nav */
-    top: var(--vp-layout-top-height, 0px) !important;
-    padding-top: var(--vp-nav-height) !important;
+    /* Sticky header is in-flow; sidebar fills viewport below it */
+    top: var(--vp-nav-height) !important;
+    padding-top: 0 !important;
     width: var(--vp-sidebar-width) !important;
-    max-height: calc(100vh - var(--vp-layout-top-height, 0px)) !important;
+    max-height: calc(100vh - var(--vp-nav-height)) !important;
   }
 
   .VPSidebar .curtain {
-    background-color: var(--color-sand-light-1) !important;
-    height: var(--vp-nav-height) !important;
-  }
-
-  .dark .VPSidebar .curtain {
-    background-color: var(--color-sand-dark-1) !important;
+    display: none !important;
   }
 }
 
@@ -281,13 +287,27 @@
   font-weight: 500;
 }
 
-.VPSidebarItem.level-1.is-active > .item {
-  box-shadow: inset 3px 0 0 var(--color-laravel-red);
-}
-
 .VPSidebarItem .item {
   position: relative;
   padding: 0.35rem 0;
+}
+
+/* Active bar via VitePress .indicator — gap from text via padding */
+.VPSidebarItem.level-1 .item {
+  padding: 0.35rem 0 0.35rem 0.85rem;
+}
+
+.VPSidebarItem.level-1 .item > .indicator {
+  top: 0.35rem;
+  bottom: 0.35rem;
+  left: 0;
+  width: 3px;
+  border-radius: 0;
+  background: transparent;
+}
+
+.VPSidebarItem.level-1.is-active > .item > .indicator {
+  background-color: var(--color-laravel-red);
 }
 
 .VPSidebarItem.level-0 {
@@ -352,18 +372,37 @@
   font-weight: 500;
 }
 
-.vp-doc h2 .header-anchor,
-.vp-doc h3 .header-anchor,
-.vp-doc h4 .header-anchor {
+/* Align # with heading text (not flush to padding box top) */
+.vp-doc .header-anchor {
+  position: absolute;
+  left: 0;
+  margin-left: -0.95em;
   color: var(--color-laravel-red);
   opacity: 0;
   font-weight: 400;
-  margin-left: -0.9em;
+  text-decoration: none;
+  line-height: inherit;
 }
 
+.vp-doc h1 .header-anchor,
+.vp-doc h3 .header-anchor,
+.vp-doc h4 .header-anchor {
+  top: 0;
+}
+
+.vp-doc h2 .header-anchor {
+  /* match h2 padding-top so # sits on the text line */
+  top: 0.5rem;
+}
+
+.vp-doc h1:hover .header-anchor,
 .vp-doc h2:hover .header-anchor,
 .vp-doc h3:hover .header-anchor,
-.vp-doc h4:hover .header-anchor {
+.vp-doc h4:hover .header-anchor,
+.vp-doc h1 .header-anchor:focus,
+.vp-doc h2 .header-anchor:focus,
+.vp-doc h3 .header-anchor:focus,
+.vp-doc h4 .header-anchor:focus {
   opacity: 0.7;
 }
 
@@ -523,14 +562,14 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Code blocks — Laravel torchlight chrome (outer sand-dark-1 + inner #292D3E)*/
+/* Code blocks — sand chrome + Geist Mono                                     */
 /* -------------------------------------------------------------------------- */
 
 .vp-doc div[class*='language-'] {
   margin: 1.15rem 0 1.5rem;
   border-radius: 0.375rem;
-  background: var(--color-sand-dark-1) !important;
-  border: 1px solid transparent;
+  background: var(--color-code-chrome) !important;
+  border: 1px solid var(--color-sand-dark-5);
   padding: 0.3rem !important;
   box-shadow: none;
 }
@@ -543,6 +582,7 @@
 .vp-doc div[class*='language-'] > button.copy + span,
 .vp-doc div[class*='language-'] code {
   background: var(--color-code-bg) !important;
+  font-family: var(--vp-font-family-mono) !important;
 }
 
 .vp-doc div[class*='language-'] > pre {
@@ -570,14 +610,15 @@
   border-right: none;
   border-radius: 0.25rem 0 0 0.25rem;
   background: transparent;
-  color: #4c5374 !important;
+  color: var(--color-code-line-num) !important;
+  font-family: var(--vp-font-family-mono) !important;
   font-size: 13px;
   line-height: 1.7;
   z-index: 2;
 }
 
 .vp-doc .line-numbers-wrapper .line-number {
-  color: #4c5374 !important;
+  color: var(--color-code-line-num) !important;
 }
 
 .vp-doc [class*='language-'] > button.copy {
@@ -643,7 +684,7 @@
 }
 
 .VPHero.VPHomeHero {
-  padding: 2.25rem 0 1.25rem !important;
+  padding: 2.75rem 0 1.25rem !important;
 }
 
 .VPHero .container {
