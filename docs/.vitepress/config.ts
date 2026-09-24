@@ -21,6 +21,14 @@ export default defineConfig({
     ['meta', { name: 'theme-color', content: '#f53003' }],
   ],
 
+  markdown: {
+    theme: {
+      light: 'material-theme-palenight',
+      dark: 'material-theme-palenight',
+    },
+    lineNumbers: true,
+  },
+
   themeConfig: {
     logo: { light: '/logo.svg', dark: '/logo.svg' },
     siteTitle: 'System Design',
@@ -30,6 +38,9 @@ export default defineConfig({
     },
     search: {
       provider: 'local',
+      options: {
+        detailedView: true,
+      },
     },
     nav: [
       { text: 'Docs', link: '/fundamentals/big-o' },

@@ -1,217 +1,841 @@
+/**
+ * Laravel docs–inspired VitePress theme
+ * Reference: laravel.com/docs sticky-nav + docs_main + torchlight code chrome
+ */
+
 :root {
-  --vp-font-family-base: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --vp-font-family-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
-    Consolas, monospace;
+  --color-sand-light-1: #fdfdfc;
+  --color-sand-light-2: #f9f9f8;
+  --color-sand-light-3: #f1f0ef;
+  --color-sand-light-4: #e9e8e6;
+  --color-sand-light-5: #e2e1de;
+  --color-sand-light-6: #dad9d6;
+  --color-sand-light-7: #cfceca;
+  --color-sand-light-8: #bcbbb5;
+  --color-sand-light-9: #8d8d86;
+  --color-sand-light-10: #82827c;
+  --color-sand-light-11: #63635e;
+  --color-sand-light-12: #21201c;
 
-  --vp-c-brand-1: #f53003;
+  --color-sand-dark-1: #111110;
+  --color-sand-dark-2: #191918;
+  --color-sand-dark-3: #222221;
+  --color-sand-dark-4: #2a2a28;
+  --color-sand-dark-5: #31312e;
+  --color-sand-dark-6: #3b3a37;
+  --color-sand-dark-7: #494844;
+  --color-sand-dark-8: #62605b;
+  --color-sand-dark-9: #6f6d66;
+  --color-sand-dark-10: #7c7b74;
+  --color-sand-dark-11: #b5b3ad;
+  --color-sand-dark-12: #eeeeec;
+
+  --color-laravel-red: #f53003;
+  --color-code-bg: #292d3e;
+
+  --vp-c-brand-1: var(--color-laravel-red);
   --vp-c-brand-2: #c42602;
-  --vp-c-brand-3: #f53003;
-  --vp-c-brand-soft: #ffe2dd;
+  --vp-c-brand-3: #9e1f02;
+  --vp-c-brand-soft: color-mix(in oklab, var(--color-laravel-red) 12%, transparent);
 
-  --vp-c-bg: #fdfdfc;
-  --vp-c-bg-alt: #f9f9f8;
-  --vp-c-bg-elv: #ffffff;
-  --vp-c-bg-soft: #f1f0ef;
+  --vp-c-bg: var(--color-sand-light-1);
+  --vp-c-bg-alt: var(--color-sand-light-2);
+  --vp-c-bg-elv: var(--color-sand-light-1);
+  --vp-c-bg-soft: var(--color-sand-light-3);
 
-  --vp-c-border: #e2e1de;
-  --vp-c-divider: #e9e8e6;
-  --vp-c-gutter: #e2e1de;
+  --vp-c-border: var(--color-sand-light-5);
+  --vp-c-divider: var(--color-sand-light-5);
+  --vp-c-gutter: var(--color-sand-light-4);
 
-  --vp-c-text-1: #21201c;
-  --vp-c-text-2: #63635e;
-  --vp-c-text-3: #8d8d86;
+  --vp-c-text-1: var(--color-sand-light-12);
+  --vp-c-text-2: var(--color-sand-light-11);
+  --vp-c-text-3: var(--color-sand-light-9);
 
-  --vp-sidebar-bg-color: #fdfdfc;
-  --vp-nav-bg-color: #fdfdfc;
+  --vp-font-family-base: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+  --vp-font-family-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  --vp-code-block-bg: #292d3e;
-  --vp-code-color: #bfc7d5;
+  --vp-nav-height: 4rem;
+  --vp-sidebar-width: 260px;
+  --vp-code-block-bg: var(--color-code-bg);
+  --vp-code-copy-code-bg: transparent;
+  --vp-code-copy-code-hover-bg: color-mix(in oklab, #fff 8%, transparent);
+  --vp-code-copy-code-border-color: transparent;
+  --vp-code-line-number-color: #4c5374;
+  --vp-code-font-size: 13px;
+  --vp-code-line-height: 1.7;
 
-  --vp-custom-block-tip-border: #e2e1de;
-  --vp-custom-block-tip-text: #63635e;
-  --vp-custom-block-tip-bg: #f9f9f8;
-  --vp-custom-block-tip-code-bg: #f1f0ef;
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-text: #fff;
+  --vp-button-brand-bg: var(--color-laravel-red);
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-hover-text: #fff;
+  --vp-button-brand-hover-bg: #c42602;
+  --vp-button-brand-active-border: transparent;
+  --vp-button-brand-active-text: #fff;
+  --vp-button-brand-active-bg: #9e1f02;
+
+  --vp-button-alt-border: var(--color-sand-light-6);
+  --vp-button-alt-text: var(--color-sand-light-12);
+  --vp-button-alt-bg: var(--color-sand-light-3);
+  --vp-button-alt-hover-border: var(--color-sand-light-7);
+  --vp-button-alt-hover-text: var(--color-sand-light-12);
+  --vp-button-alt-hover-bg: var(--color-sand-light-4);
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(
+    120deg,
+    var(--color-laravel-red) 30%,
+    #ff6b49
+  );
 }
 
 .dark {
-  --vp-c-brand-1: #ff6b4a;
-  --vp-c-brand-2: #f53003;
-  --vp-c-brand-3: #ff8a6e;
-  --vp-c-brand-soft: rgba(245, 48, 3, 0.18);
+  --vp-c-bg: var(--color-sand-dark-1);
+  --vp-c-bg-alt: var(--color-sand-dark-2);
+  --vp-c-bg-elv: var(--color-sand-dark-2);
+  --vp-c-bg-soft: var(--color-sand-dark-3);
 
-  --vp-c-bg: #111110;
-  --vp-c-bg-alt: #191918;
-  --vp-c-bg-elv: #222221;
-  --vp-c-bg-soft: #2a2a28;
+  --vp-c-border: var(--color-sand-dark-5);
+  --vp-c-divider: var(--color-sand-dark-5);
+  --vp-c-gutter: var(--color-sand-dark-4);
 
-  --vp-c-border: #31312e;
-  --vp-c-divider: #2a2a28;
-  --vp-c-gutter: #31312e;
+  --vp-c-text-1: var(--color-sand-dark-12);
+  --vp-c-text-2: var(--color-sand-dark-11);
+  --vp-c-text-3: var(--color-sand-dark-9);
 
-  --vp-c-text-1: #eeeeec;
-  --vp-c-text-2: #b5b3ad;
-  --vp-c-text-3: #7c7b74;
+  --vp-button-alt-border: var(--color-sand-dark-6);
+  --vp-button-alt-text: var(--color-sand-dark-12);
+  --vp-button-alt-bg: var(--color-sand-dark-3);
+  --vp-button-alt-hover-border: var(--color-sand-dark-7);
+  --vp-button-alt-hover-text: var(--color-sand-dark-12);
+  --vp-button-alt-hover-bg: var(--color-sand-dark-4);
 
-  --vp-sidebar-bg-color: #111110;
-  --vp-nav-bg-color: #111110;
-
-  --vp-code-block-bg: #1a1b26;
+  --vp-c-brand-soft: color-mix(in oklab, var(--color-laravel-red) 18%, transparent);
 }
 
-html {
-  font-optical-sizing: auto;
+/* -------------------------------------------------------------------------- */
+/* Sticky header — Laravel sticky-nav docs-nav                                */
+/* -------------------------------------------------------------------------- */
+
+.VPNav {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  background: var(--color-sand-light-1) !important;
+  border-bottom: 1px solid var(--color-sand-light-5);
+}
+
+.dark .VPNav {
+  background: var(--color-sand-dark-1) !important;
+  border-bottom-color: var(--color-sand-dark-5);
+}
+
+.VPNavBar {
+  height: var(--vp-nav-height) !important;
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+.VPNavBar .container,
+.VPNavBar .wrapper {
+  max-width: 1400px;
+  margin-inline: auto;
+  height: 100%;
+}
+
+.VPNavBar .container {
+  padding-inline: 1rem;
+}
+
+@media (min-width: 1280px) {
+  .VPNavBar .container {
+    padding-inline: 4rem;
+  }
+
+  .VPNavBar.has-sidebar .container {
+    border-left: 1px solid var(--color-sand-light-5);
+  }
+
+  .dark .VPNavBar.has-sidebar .container {
+    border-left-color: var(--color-sand-dark-5);
+  }
 }
 
 .VPNavBarTitle .title {
   font-weight: 600;
+  font-size: 0.95rem;
   letter-spacing: -0.02em;
+  color: var(--color-laravel-red) !important;
+  border: none !important;
 }
+
+.VPNavBarTitle .logo {
+  height: 1.35rem;
+  margin-right: 0.5rem;
+}
+
+.VPNavBar .content-body {
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+.VPNavBarMenuLink {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--vp-c-text-2) !important;
+}
+
+.VPNavBarMenuLink:hover,
+.VPNavBarMenuLink.active {
+  color: var(--vp-c-text-1) !important;
+}
+
+.VPNavBarSearch .DocSearch-Button {
+  justify-content: flex-start;
+  margin: 0;
+  padding: 0 0.65rem;
+  height: 2.25rem;
+  border-radius: 0.25rem;
+  background: var(--color-sand-light-3);
+  border: none;
+  color: var(--color-sand-light-9);
+}
+
+.dark .VPNavBarSearch .DocSearch-Button {
+  background: var(--color-sand-dark-5);
+  color: var(--color-sand-dark-10);
+}
+
+.VPNavBarSearch .DocSearch-Button:hover {
+  background: var(--color-sand-light-4);
+  box-shadow: none;
+}
+
+.dark .VPNavBarSearch .DocSearch-Button:hover {
+  background: var(--color-sand-dark-4);
+}
+
+.VPNavBarSearch .DocSearch-Button-Placeholder,
+.VPNavBarSearch .DocSearch-Button-Keys {
+  font-size: 0.8125rem;
+}
+
+.VPNavScreen {
+  background: var(--vp-c-bg) !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Sidebar — content starts BELOW sticky header (VitePress model)             */
+/* top: 0 + padding-top: nav-height + curtain covers scrolled content         */
+/* -------------------------------------------------------------------------- */
 
 .VPSidebar {
-  border-inline-end: 1px solid var(--vp-c-divider);
-  padding-top: 1.5rem !important;
+  z-index: 25 !important;
+  background: var(--color-sand-light-1) !important;
+  border-right: 1px solid var(--color-sand-light-5);
+  scrollbar-width: thin;
 }
 
-.VPSidebarItem.level-0 > .item > .text {
-  font-size: 0.8rem;
+.dark .VPSidebar {
+  background: var(--color-sand-dark-1) !important;
+  border-right-color: var(--color-sand-dark-5);
+}
+
+@media (min-width: 960px) {
+  .VPSidebar {
+    /* Stick under layout-top; pad so items start below sticky nav */
+    top: var(--vp-layout-top-height, 0px) !important;
+    padding-top: var(--vp-nav-height) !important;
+    width: var(--vp-sidebar-width) !important;
+    max-height: calc(100vh - var(--vp-layout-top-height, 0px)) !important;
+  }
+
+  .VPSidebar .curtain {
+    background-color: var(--color-sand-light-1) !important;
+    height: var(--vp-nav-height) !important;
+  }
+
+  .dark .VPSidebar .curtain {
+    background-color: var(--color-sand-dark-1) !important;
+  }
+}
+
+.VPSidebarItem.level-0 > .item .text,
+.VPSidebarItem.level-0 > .item .link > .text {
+  font-size: 0.8125rem;
   font-weight: 600;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--vp-c-text-1);
-  margin-bottom: 0.35rem;
+  color: var(--vp-c-text-1) !important;
+  letter-spacing: -0.01em;
 }
 
 .VPSidebarItem.level-1 .text {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 400;
-  color: var(--vp-c-text-2);
+  color: var(--vp-c-text-2) !important;
+  line-height: 1.35;
 }
 
-.VPSidebarItem.is-active > .item .link > .text {
-  color: var(--vp-c-brand-1) !important;
+.VPSidebarItem.level-1.is-active > .item .text,
+.VPSidebarItem.level-1.is-active > .item .link > .text {
+  color: var(--vp-c-text-1) !important;
   font-weight: 500;
 }
+
+.VPSidebarItem.level-1.is-active > .item {
+  box-shadow: inset 3px 0 0 var(--color-laravel-red);
+}
+
+.VPSidebarItem .item {
+  position: relative;
+  padding: 0.35rem 0;
+}
+
+.VPSidebarItem.level-0 {
+  padding-bottom: 0.65rem;
+}
+
+.VPSidebarItem .caret,
+.VPSidebarItem .link {
+  border-radius: 0.2rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Doc content — docs_main                                                    */
+/* -------------------------------------------------------------------------- */
 
 .VPDoc {
-  padding-top: 2rem !important;
+  padding-top: 1.75rem !important;
 }
 
-.VPDoc h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-  margin-bottom: 1.25rem;
+.vp-doc {
+  max-width: 65ch;
 }
 
-.VPDoc h2 {
-  font-size: 1.35rem;
-  font-weight: 600;
+.vp-doc h1 {
   letter-spacing: -0.02em;
-  border-top: 1px solid var(--vp-c-divider);
-  margin-top: 2.5rem;
-  padding-top: 1.5rem;
-}
-
-.VPDoc h3 {
-  font-size: 1.1rem;
+  margin-bottom: 1.75rem;
+  font-size: 2rem;
   font-weight: 600;
-}
-
-.VPDoc p,
-.VPDoc li {
-  line-height: 1.75;
-  font-size: 1rem;
-}
-
-.VPDoc table {
-  display: block;
-  overflow-x: auto;
-  font-size: 0.9rem;
-}
-
-.VPDoc th {
-  background: var(--vp-c-bg-soft);
-  font-weight: 600;
-}
-
-.VPDoc a {
-  color: var(--vp-c-brand-1);
-  font-weight: 500;
-  text-decoration: none;
-}
-
-.VPDoc a:hover {
-  text-decoration: underline;
-}
-
-.VPDoc code:not(pre code) {
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-border);
-  border-radius: 0.25rem;
-  padding: 0.1rem 0.35rem;
-  font-size: 0.875em;
+  line-height: 1.15;
   color: var(--vp-c-text-1);
 }
 
-.dark .VPDoc code:not(pre code) {
-  border-color: var(--vp-c-border);
+@media (min-width: 960px) {
+  .vp-doc h1 {
+    font-size: 2.35rem;
+  }
 }
 
-div[class*='language-'] {
-  border-radius: 0.5rem;
-  border: 1px solid transparent;
+.vp-doc h2 {
+  letter-spacing: -0.01em;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  border-top: none;
+  padding-top: 0.5rem;
+  font-size: 1.45rem;
+  font-weight: 500;
+  line-height: 1.25;
 }
 
-.vp-doc .custom-block.tip {
-  border-radius: 0.5rem;
-  border: 1px solid var(--vp-c-border);
-  background: var(--vp-c-bg-alt);
+.vp-doc h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.55rem;
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
-.vp-doc .custom-block.tip .custom-block-title {
-  color: #8d54c5;
+.vp-doc h4 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
-.VPNavBar {
-  border-bottom: 1px solid var(--vp-c-divider) !important;
+.vp-doc h2 .header-anchor,
+.vp-doc h3 .header-anchor,
+.vp-doc h4 .header-anchor {
+  color: var(--color-laravel-red);
+  opacity: 0;
+  font-weight: 400;
+  margin-left: -0.9em;
 }
 
-.VPLocalNav {
-  border-bottom: 1px solid var(--vp-c-divider);
+.vp-doc h2:hover .header-anchor,
+.vp-doc h3:hover .header-anchor,
+.vp-doc h4:hover .header-anchor {
+  opacity: 0.7;
 }
 
-.VPDocAsideOutline .outline-title {
+.vp-doc p,
+.vp-doc li {
+  color: var(--vp-c-text-2);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.vp-doc p {
+  margin-bottom: 1.15rem;
+}
+
+.vp-doc a {
+  color: var(--color-laravel-red);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-thickness: 1px;
+}
+
+.vp-doc a:hover {
+  color: #c42602;
+}
+
+.vp-doc :not(pre) > code {
+  color: var(--vp-c-text-1);
+  background: transparent;
+  border: none;
+  padding: 0 0.15rem;
   font-size: 0.8rem;
   font-weight: 500;
+  border-radius: 0.125rem;
+}
+
+.vp-doc strong {
+  color: var(--vp-c-text-1);
+  font-weight: 600;
+}
+
+.vp-doc ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.vp-doc ul > li {
+  position: relative;
+  padding-left: 1.15em;
+  margin-bottom: 0.55rem;
+}
+
+.vp-doc ul > li::before {
+  content: '';
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: var(--color-laravel-red);
+  border-radius: 1px;
+  opacity: 0.85;
+}
+
+.vp-doc ol {
+  list-style: none;
+  counter-reset: ordered-list;
+  padding-left: 0;
+}
+
+.vp-doc ol > li {
+  position: relative;
+  padding-left: 1.35em;
+  margin-bottom: 0.55rem;
+  counter-increment: ordered-list;
+}
+
+.vp-doc ol > li::before {
+  content: counter(ordered-list) '. ';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--color-laravel-red);
+  font-variant-numeric: tabular-nums;
+}
+
+.vp-doc table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.25rem 0 1.75rem;
+  font-size: 0.8125rem;
+  display: table;
+}
+
+.vp-doc th,
+.vp-doc td {
+  border: 1px solid var(--vp-c-border);
+  text-align: left;
+  padding: 0.55rem 0.7rem;
+}
+
+.vp-doc th {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+  background: var(--vp-c-bg-soft);
+}
+
+.vp-doc blockquote {
+  border-left: 3px solid var(--color-laravel-red);
+  background: var(--vp-c-bg-soft);
+  margin: 1.25rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0 0.375rem 0.375rem 0;
   color: var(--vp-c-text-2);
 }
 
-.VPDocAsideOutline .outline-link {
+.vp-doc blockquote p {
+  margin: 0;
+}
+
+/* Callout tip / warning (Laravel-style) */
+.custom-block {
+  border-radius: 0.375rem;
+  border: 1px solid var(--color-sand-light-5);
+  background: var(--vp-c-bg);
+  padding: 0.75rem 1rem;
+  margin: 1.25rem 0 1.75rem;
+}
+
+.dark .custom-block {
+  border-color: var(--color-sand-dark-5);
+}
+
+.custom-block.tip {
+  border-left: 3px solid #8d54c5;
+}
+
+.custom-block.warning,
+.custom-block.danger {
+  border-left: 3px solid var(--color-laravel-red);
+}
+
+.custom-block .custom-block-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--vp-c-text-1);
+}
+
+.custom-block p {
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.custom-block p:last-child {
+  margin-bottom: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Code blocks — Laravel torchlight chrome (outer sand-dark-1 + inner #292D3E)*/
+/* -------------------------------------------------------------------------- */
+
+.vp-doc div[class*='language-'] {
+  margin: 1.15rem 0 1.5rem;
+  border-radius: 0.375rem;
+  background: var(--color-sand-dark-1) !important;
+  border: 1px solid transparent;
+  padding: 0.3rem !important;
+  box-shadow: none;
+}
+
+.dark .vp-doc div[class*='language-'] {
+  border-color: var(--color-sand-dark-5);
+}
+
+.vp-doc div[class*='language-'] > pre,
+.vp-doc div[class*='language-'] > button.copy + span,
+.vp-doc div[class*='language-'] code {
+  background: var(--color-code-bg) !important;
+}
+
+.vp-doc div[class*='language-'] > pre {
+  margin: 0 !important;
+  border-radius: 0.25rem;
+  border: 1px solid color-mix(in oklab, var(--color-sand-dark-8) 25%, transparent);
+  padding: 1.1rem 1.15rem !important;
+  overflow-x: auto;
+}
+
+.vp-doc div[class*='language-'].line-numbers-mode {
+  padding-left: 0.3rem !important;
+}
+
+.vp-doc div[class*='language-'].line-numbers-mode > pre {
+  padding-left: 3.25rem !important;
+}
+
+.vp-doc .line-numbers-wrapper {
+  top: 0.3rem;
+  bottom: 0.3rem;
+  left: 0.3rem;
+  padding-top: 1.1rem;
+  width: 2.5rem;
+  border-right: none;
+  border-radius: 0.25rem 0 0 0.25rem;
+  background: transparent;
+  color: #4c5374 !important;
   font-size: 13px;
-  color: var(--vp-c-text-2);
+  line-height: 1.7;
+  z-index: 2;
 }
 
-.VPDocAsideOutline .outline-link.active {
-  color: var(--vp-c-brand-1);
+.vp-doc .line-numbers-wrapper .line-number {
+  color: #4c5374 !important;
 }
 
-.VPHomeHero .name {
-  color: var(--vp-c-brand-1) !important;
+.vp-doc [class*='language-'] > button.copy {
+  top: 0.85rem;
+  right: 0.85rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  background-size: 18px;
+  opacity: 0;
 }
 
-.VPHomeHero .text {
-  letter-spacing: -0.03em;
+.vp-doc [class*='language-']:hover > button.copy,
+.vp-doc [class*='language-'] > button.copy:focus {
+  opacity: 0.7;
+}
+
+.vp-doc [class*='language-'] > button.copy:hover {
+  opacity: 1;
+  background-color: color-mix(in oklab, #fff 8%, transparent);
+}
+
+.vp-doc [class*='language-'] > span.lang {
+  top: 0.55rem;
+  right: 2.75rem;
+  color: var(--color-sand-dark-9);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Aside / outline                                                            */
+/* -------------------------------------------------------------------------- */
+
+.VPDocAside .outline-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vp-c-text-3);
+}
+
+.VPDocOutlineItem .outline-link {
+  font-size: 0.8rem;
+  color: var(--vp-c-text-2) !important;
+}
+
+.VPDocOutlineItem .outline-link.active,
+.VPDocOutlineItem .outline-link:hover {
+  color: var(--color-laravel-red) !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Home — compact hero + features matching docs chrome                        */
+/* -------------------------------------------------------------------------- */
+
+.VPHome {
+  padding-bottom: 3rem !important;
+  margin-bottom: 0 !important;
+}
+
+.VPHero.VPHomeHero {
+  padding: 2.25rem 0 1.25rem !important;
+}
+
+.VPHero .container {
+  max-width: 1100px !important;
+}
+
+.VPHero .name {
+  font-size: clamp(1.85rem, 4vw, 2.5rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.1 !important;
+  color: var(--color-laravel-red) !important;
+}
+
+.VPHero .text {
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.02em !important;
+  line-height: 1.25 !important;
+  color: var(--vp-c-text-1) !important;
+  max-width: 26rem;
+}
+
+.VPHero .tagline {
+  font-size: 0.9rem !important;
+  line-height: 1.5 !important;
+  color: var(--vp-c-text-2) !important;
+  max-width: 30rem;
+  margin-top: 0.65rem !important;
+}
+
+.VPHero .actions {
+  gap: 0.5rem !important;
+  margin-top: 1.1rem !important;
+  padding-top: 0 !important;
+}
+
+.VPButton {
+  border-radius: 0.375rem !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em;
+  line-height: 1.25 !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.VPButton.medium {
+  padding: 0.45rem 0.95rem !important;
+  border-radius: 0.375rem !important;
+}
+
+.VPButton.brand {
+  box-shadow: 0 0 1px 0 #00000008, 0 1px 2px 0 #0000000f;
+}
+
+.VPButton.alt {
+  background: var(--color-sand-light-3) !important;
+  border: 1px solid var(--color-sand-light-6) !important;
+  color: var(--color-sand-light-12) !important;
+}
+
+.VPButton.alt:hover {
+  background: var(--color-sand-light-4) !important;
+  border-color: var(--color-sand-light-7) !important;
+}
+
+.dark .VPButton.alt {
+  background: var(--color-sand-dark-3) !important;
+  border-color: var(--color-sand-dark-6) !important;
+  color: var(--color-sand-dark-12) !important;
+}
+
+.dark .VPButton.alt:hover {
+  background: var(--color-sand-dark-4) !important;
+  border-color: var(--color-sand-dark-7) !important;
+}
+
+.VPFeatures {
+  padding: 1.25rem 0 0.5rem !important;
+}
+
+.VPFeatures .container {
+  max-width: 1100px !important;
+}
+
+.VPFeatures .items {
+  gap: 0.75rem !important;
+  margin: 0 !important;
 }
 
 .VPFeature {
-  border: 1px solid var(--vp-c-border) !important;
-  background: var(--vp-c-bg-alt) !important;
+  border: 1px solid var(--color-sand-light-5) !important;
   border-radius: 0.5rem !important;
+  background: var(--color-sand-light-1) !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .VPFeature:hover {
-  border-color: var(--vp-c-brand-1) !important;
+  border-color: var(--color-sand-light-7) !important;
+  background: var(--color-sand-light-2) !important;
 }
 
+.dark .VPFeature {
+  border-color: var(--color-sand-dark-5) !important;
+  background: var(--color-sand-dark-2) !important;
+}
+
+.dark .VPFeature:hover {
+  border-color: var(--color-sand-dark-7) !important;
+  background: var(--color-sand-dark-3) !important;
+}
+
+.VPFeature .box {
+  padding: 1rem 1.1rem !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+.VPFeature .title {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em;
+  color: var(--vp-c-text-1) !important;
+  margin-bottom: 0.35rem !important;
+}
+
+.VPFeature .details {
+  font-size: 0.8125rem !important;
+  line-height: 1.5 !important;
+  color: var(--vp-c-text-2) !important;
+  padding: 0 !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Local nav / prev-next / footer — compact                                   */
+/* -------------------------------------------------------------------------- */
+
+.VPLocalNav {
+  background: var(--vp-c-bg) !important;
+  border-bottom-color: var(--vp-c-divider) !important;
+}
+
+.VPDocFooter .prev-next {
+  border-top-color: var(--vp-c-divider);
+  padding-top: 1.25rem;
+}
+
+.VPDocFooter .pager-link {
+  border: 1px solid var(--vp-c-border);
+  border-radius: 0.375rem;
+  padding: 0.75rem 1rem;
+  background: var(--vp-c-bg);
+}
+
+.VPDocFooter .pager-link:hover {
+  border-color: var(--color-laravel-red);
+}
+
+.VPDocFooter .pager-link .title {
+  color: var(--color-laravel-red);
+  font-size: 0.9rem;
+}
+
+.VPFooter {
+  border-top: 1px solid var(--vp-c-divider) !important;
+  background: var(--vp-c-bg-alt) !important;
+  padding: 1.5rem 0 !important;
+}
+
+.VPFooter .message,
+.VPFooter .copyright {
+  font-size: 0.8rem;
+  color: var(--vp-c-text-3);
+}
+
+/* Content container width */
+@media (min-width: 960px) {
+  .VPContent.has-sidebar {
+    padding-left: var(--vp-sidebar-width) !important;
+  }
+}
+
+.VPDoc .content-container {
+  max-width: 52rem !important;
+}
+
+/* Slightly tighter overall rhythm */
+.Layout {
+  font-feature-settings: 'ss02' 1, 'ss09' 1;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-laravel-red) 22%, transparent);
+}
