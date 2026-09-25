@@ -929,3 +929,123 @@
 ::selection {
   background: color-mix(in oklab, var(--color-laravel-red) 22%, transparent);
 }
+
+/* -------------------------------------------------------------------------- */
+/* Bilingual docs — LTR (EN) + RTL (FA / Rubik)                               */
+/* -------------------------------------------------------------------------- */
+
+.lang-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin: 0 0 1.75rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--vp-c-border);
+  border-radius: 0.375rem;
+  background: var(--vp-c-bg-soft);
+  font-size: 0.875rem;
+}
+
+.lang-switch a {
+  color: var(--color-laravel-red);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.lang-switch a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.doc-lang + .doc-lang {
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.doc-lang--en {
+  direction: ltr;
+  text-align: left;
+}
+
+.doc-lang--fa {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Rubik', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+.doc-lang--fa h1,
+.doc-lang--fa h2,
+.doc-lang--fa h3,
+.doc-lang--fa h4,
+.doc-lang--fa p,
+.doc-lang--fa li,
+.doc-lang--fa th,
+.doc-lang--fa td,
+.doc-lang--fa .custom-block-title {
+  font-family: 'Rubik', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+.doc-lang--fa th,
+.doc-lang--fa td {
+  text-align: right;
+}
+
+.doc-lang--fa ul > li {
+  padding-left: 0;
+  padding-right: 1.15em;
+}
+
+.doc-lang--fa ul > li::before {
+  left: auto;
+  right: 0;
+}
+
+.doc-lang--fa ol > li {
+  padding-left: 0;
+  padding-right: 1.35em;
+}
+
+.doc-lang--fa ol > li::before {
+  left: auto;
+  right: 0;
+}
+
+.doc-lang--fa blockquote {
+  border-left: none;
+  border-right: 3px solid var(--color-laravel-red);
+  border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.doc-lang--fa .custom-block.tip,
+.doc-lang--fa .custom-block.warning,
+.doc-lang--fa .custom-block.danger {
+  border-left: 1px solid var(--color-sand-light-5);
+  border-right: 3px solid #8d54c5;
+}
+
+.doc-lang--fa .custom-block.warning,
+.doc-lang--fa .custom-block.danger {
+  border-right-color: var(--color-laravel-red);
+}
+
+.dark .doc-lang--fa .custom-block.tip,
+.dark .doc-lang--fa .custom-block.warning,
+.dark .doc-lang--fa .custom-block.danger {
+  border-left-color: var(--color-sand-dark-5);
+}
+
+.doc-lang--fa .header-anchor {
+  left: auto;
+  right: 0;
+  margin-left: 0;
+  margin-right: -0.95em;
+}
+
+/* Keep code LTR even inside Farsi sections */
+.doc-lang--fa div[class*='language-'],
+.doc-lang--fa :not(pre) > code {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: isolate;
+}
