@@ -15,7 +15,7 @@ hero:
 
 features:
   - title: Fundamentals
-    details: Big O, Quick Sort, Binary Search
+    details: Big O, Sort/Search, Hash, BFS/DFS, Window
   - title: Patterns
     details: CQRS, Cache, Outbox, Directory Query
   - title: Architecture

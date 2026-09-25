@@ -13,7 +13,8 @@ const enSidebar: DefaultTheme.Sidebar = [
     text: 'Fundamentals & Algorithms',
     items: [
       { text: 'Big O Notation', link: '/fundamentals/big-o' },
-      { text: 'Quick Sort & Binary Search', link: '/fundamentals/sorting-search' },
+      { text: 'Quick / Merge Sort & Binary Search', link: '/fundamentals/sorting-search' },
+      { text: 'More Common Algorithms', link: '/fundamentals/common-algorithms' },
     ],
   },
   {
@@ -60,7 +61,8 @@ const faSidebar: DefaultTheme.Sidebar = [
     text: 'مبانی و الگوریتم‌ها',
     items: [
       { text: 'نماد Big O', link: '/fa/fundamentals/big-o' },
-      { text: 'Quick Sort و Binary Search', link: '/fa/fundamentals/sorting-search' },
+      { text: 'Quick / Merge Sort و Binary Search', link: '/fa/fundamentals/sorting-search' },
+      { text: 'الگوریتم‌های پرکاربرد بیشتر', link: '/fa/fundamentals/common-algorithms' },
     ],
   },
   {

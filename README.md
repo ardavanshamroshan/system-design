@@ -8,7 +8,7 @@ System design and software architecture documentation, styled like Laravel docs,
 
 | Group | Pages |
 |-------|--------|
-| Fundamentals & Algorithms | Big O, Quick Sort / Binary Search |
+| Fundamentals & Algorithms | Big O, Sort/Search, Common Algorithms |
 | Software Patterns | CQRS, Directory Query, Cache Patterns, Outbox |
 | System Architecture | API Gateway, CAP Theorem |
 | Messaging | DLQ, Brokers, Acknowledgment |

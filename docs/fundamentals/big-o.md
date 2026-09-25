@@ -1,97 +1,167 @@
-# Big O Notation
+# Big O Notation — Lesson 1
 
-## What is it and why?
+> Module A — Fundamentals & Algorithms · Section 1
 
-**Big O** describes how an algorithm’s cost (time or memory) grows with **input size `n`** — not how many milliseconds it takes on your laptop.
+## Mental outline
 
-| Lens | Question |
+1. [What and why](#what-and-why)  
+2. [Practical definition](#practical-definition)  
+3. [Notation family](#notation-family-o-θ-ω)  
+4. [Common orders](#common-orders)  
+5. [Reading complexity from code](#reading-complexity-from-code)  
+6. [PHP / Python examples](#php--python-examples)  
+7. [Notes and antipatterns](#notes-and-antipatterns)  
+8. [Decision rule](#decision-rule)
+
+---
+
+## What and why
+
+**Big O** describes how an algorithm’s cost (time or space) grows with input size `n` — not milliseconds on your laptop.
+
+| View | Question |
 |------|----------|
-| Absolute time | “How long does this function take on my Mac?” |
-| Big O | “If `n` grows 10×, roughly how much does the cost grow?” |
+| Absolute time | “How many ms on my Mac?” |
+| Big O | “If `n` grows 10×, about how many times does cost grow?” |
 
-In interviews and system design, Big O is the shared language: “With 10× traffic, how much do DB / CPU / cost grow?”
+Shared language in interviews and system design: “At 10× traffic, how does CPU/DB/cost scale?”
 
----
+Drop lower terms quickly:
 
-## Mental model
-
-Think of `n` as the number of items (users, rows, keys).
-
-| Symbol | Rough meaning | When `n` ×10 | Example |
-|--------|---------------|--------------|---------|
-| **O(1)** | Constant | Cost stays about the same | hash lookup, `$arr[$i]` |
-| **O(log n)** | Logarithmic | A bit more (not 10×) | binary search on sorted data |
-| **O(n)** | Linear | ≈ 10× | one `foreach` over a list |
-| **O(n log n)** | Quasi-linear | A bit more than 10× | mergesort / average quicksort |
-| **O(n²)** | Quadratic | ≈ 100× | nested loops over the same set |
-| **O(2ⁿ)** | Exponential | Catastrophe | subsets without memoization |
-
-Typical order from better to worse (for time):
+1. Keep only the highest-order term  
+2. Drop its constant coefficient  
 
 ```
-O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ)
+f(n) = 3n² + 2n + 1000 log n + 5000  →  O(n²)
 ```
 
 ---
 
-## Important points people miss
+## Practical definition
 
-1. **It hides constants**  
-   `O(2n)` and `O(100n)` are both **O(n)**. Great for comparing algorithms; for “this API is slow right now,” constants sometimes matter.
+`f(n) = O(g(n))` means for large enough `n`, some constant `c` exists such that:
 
-2. **Worst case is the default**  
-   When people say Big O, they usually mean **worst case** (unless they say average).
+```
+|f(n)| ≤ c · g(n)
+```
 
-3. **Time ≠ memory**  
-   You can trade time for memory: e.g. duplicates with a `seen` set → **O(n) time + O(n) memory**.
+So `f` does **not grow faster** than `c·g` (upper bound).  
+Prefer tighter bounds: `O(n¹⁰⁰)` may be true, but for `73n³+…` say `O(n³)` or better `Θ(n³)`.
 
-4. **I/O is often more expensive than CPU**  
-   N+1 queries = **O(n) network requests**; even if each query is “fast,” scalability dies.
+The `=` in Big O is conventional “set membership” — one-way: from `n = O(n²)` you cannot conclude `n² = O(n)`.
 
 ---
 
-## PHP examples
+## Notation family (O, Θ, Ω)
 
-### O(1) — direct access
+| Symbol | CS meaning | Intuition |
+|--------|------------|-----------|
+| **O** | Upper bound | “No worse than this” (up to a constant) |
+| **Ω** (Knuth) | Lower bound | “At least this much” |
+| **Θ** | Tight bound | Both sides — same order |
+| **o** (little-o) | Strictly slower | `f/g → 0` |
+| **ω** | Strictly faster | `f/g → ∞` |
+
+Example: `2n² − 10n = Θ(n²)` for large `n`.  
+In casual talk people often say “Big O” even when they mean Θ.
+
+Growth ladder (better → worse for time, roughly):
+
+```
+O(1) < O(log n) < O(√n) < O(n) < O(n log n) < O(n²) < O(2ⁿ) < O(n!)
+```
+
+Useful rules:
+
+- Larger powers dominate smaller: `n² = O(n³)`  
+- Powers dominate logs: `(log n)¹⁰⁰ = O(n)`  
+- Exponentials dominate polynomials: `n¹⁰⁰ = O(2ⁿ)`  
+- Log base doesn’t matter: `O(log₂ n) = O(log₁₀ n)`  
+- Exponential base does: `2ⁿ` and `3ⁿ` are not the same order  
+
+---
+
+## Common orders
+
+| Notation | Name | Example |
+|----------|------|---------|
+| **O(1)** | Constant | Hash lookup, indexed array access |
+| **O(log n)** | Logarithmic | Binary search, balanced BST height, B-Tree |
+| **O(n)** | Linear | Single scan, max in unsorted array |
+| **O(n log n)** | Linearithmic | Merge sort, heap sort, average quicksort |
+| **O(n²)** | Quadratic | Naive bubble/selection/insertion |
+| **O(n³)** | Cubic | Naive matrix multiply |
+| **O(2ⁿ)** | Exponential | All subsets, naive branching recursion |
+| **O(n!)** | Factorial | All permutations, brute-force TSP |
+
+Two input sizes: nested loops over `n` and `m` → **O(n·m)**, not necessarily `O(n²)`.
+
+---
+
+## Reading complexity from code
+
+| Pattern | Approx. complexity |
+|---------|-------------------|
+| No loop depending on `n` | O(1) |
+| One loop over `n` | O(n) |
+| Halving the search space each step | O(log n) |
+| Loop + recursive halving (merge sort) | O(n log n) |
+| Nested loops over same `n` | O(n²) |
+| Two-way recursion without memo | Often O(2ⁿ) |
+
+Simplify constants: `O(2n)` and `O(100n)` are both **O(n)** — shape of growth matters.
+
+---
+
+## PHP / Python examples
+
+### O(1)
 
 ```php
-$user = $usersById[$id] ?? null;
+return $arr[0];
 ```
 
-If `$usersById` is a map/hash, one lookup is roughly constant (average).
+```python
+return arr[0]
+```
 
-### O(n) — linear scan
+### O(n)
 
 ```php
-function findByEmail(array $users, string $email): ?array {
-    foreach ($users as $user) {
-        if ($user['email'] === $email) return $user;
+function findMax(array $arr): mixed {
+    $max = $arr[0];
+    foreach ($arr as $x) {
+        if ($x > $max) $max = $x;
     }
-    return null;
+    return $max;
 }
 ```
 
-Worst case you scan everyone → linear.  
-If you call this often, build an index: `email → user` → each lookup **O(1)**.
+### O(log n)
 
-### O(n²) — antipattern: pairwise compare
+```python
+def binary_search(arr, target):
+    lo, hi = 0, len(arr) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if arr[mid] == target:
+            return mid
+        if arr[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
+```
+
+### O(n²)
 
 ```php
-function hasDuplicateNaive(array $ids): bool {
-    $n = count($ids);
-    for ($i = 0; $i < $n; $i++) {
-        for ($j = $i + 1; $j < $n; $j++) {
-            if ($ids[$i] === $ids[$j]) return true;
-        }
-    }
-    return false;
+for ($i = 0; $i < $n; $i++) {
+    for ($j = 0; $j < $n; $j++) { /* ... */ }
 }
 ```
 
-Comparisons ≈ `n(n-1)/2` → **O(n²)**.  
-For `n = 10_000`, that’s about 50 million comparisons.
-
-### O(n) time, O(n) memory — better
+### O(n) time + O(n) space
 
 ```php
 function hasDuplicate(array $ids): bool {
@@ -104,36 +174,42 @@ function hasDuplicate(array $ids): bool {
 }
 ```
 
-One pass + memory for a set. Classic trade-off: **more memory, much less time**.
+### O(2ⁿ)
+
+```python
+for mask in range(1 << n):
+    ...
+```
 
 ---
 
-## Trade-offs / antipatterns
+## Notes and antipatterns
 
-- Saying “Eloquent is slow” without Big O is vague.  
-  Sometimes it isn’t the ORM — e.g. **N+1** means one query per row → network cost **O(n)**.
-- Micro-optimizing an inner loop when the algorithm is **O(n²)** is usually the wrong priority.
-- “Fast on 10 rows” ≠ “stays fast on 10 million.”
+1. **Worst case** is usually implied unless you say average/amortized.  
+2. **Time ≠ space** — you can trade one for the other.  
+3. **I/O** often dominates CPU: N+1 queries = O(n) network round-trips.  
+4. Micro-optimizing a loop while the algorithm is O(n²) is usually the wrong priority.  
+5. “Fast on 10 rows” ≠ “fast on 10 million.”  
+6. Average hash is O(1); adversarial collisions can make it O(n).
+
+---
+
+## Quick drill
+
+1. Max in unsorted array?  
+2. Binary search on sorted?  
+3. Nested loops over arrays of size `n` and `m`?  
+4. `isset($map[$key])`?  
+5. All subsets of `n` items?  
+
+::: tip Answers
+1. O(n) · 2. O(log n) · 3. O(n·m) · 4. O(1) average · 5. O(2ⁿ)
+:::
 
 ---
 
 ## Decision rule
 
-1. First look at **algorithm complexity + I/O** (how many queries? how many full dataset scans?).  
-2. Only then micro-optimize if needed (local cache, fewer allocations, …).
-
----
-
-## Quick practice
-
-For each, what’s the approximate time?
-
-1. Find max in an unsorted array  
-2. Search a sorted array with binary search  
-3. Nested loops over two separate arrays of length `n` and `m`  
-4. `isset($map[$key])` in PHP  
-5. All subsets of an `n`-element set
-
-::: tip Answers
-1. **O(n)** · 2. **O(log n)** · 3. **O(n·m)** · 4. **O(1)** average · 5. **O(2ⁿ)**
-:::
+1. Check algorithmic complexity + I/O first.  
+2. Micro-optimize only after that.  
+3. Use the growth ladder to compare options; for real SLAs, measure constants too.

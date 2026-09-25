@@ -15,7 +15,7 @@ hero:
 
 features:
   - title: مبانی
-    details: Big O، Quick Sort، Binary Search
+    details: Big O، Sort/Search، Hash، BFS/DFS، Window
   - title: الگوها
     details: CQRS، Cache، Outbox، Directory Query
   - title: معماری
