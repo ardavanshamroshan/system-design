@@ -1087,6 +1087,33 @@ html[dir='rtl'] .VPSidebarItem.level-1 .item > .indicator {
   right: 0;
 }
 
+/* "در این صفحه" outline — marker + rail on the RIGHT of links */
+html[dir='rtl'] .VPDocAsideOutline .content {
+  border-left: none !important;
+  border-right: 1px solid var(--vp-c-divider) !important;
+  padding-left: 0 !important;
+  padding-right: 16px !important;
+}
+
+html[dir='rtl'] .VPDocAsideOutline .outline-marker {
+  left: auto !important;
+  right: -1px !important;
+}
+
+html[dir='rtl'] .VPDocOutlineItem .outline-link {
+  text-align: right;
+}
+
+html[dir='rtl'] .VPDocOutlineItem .outline-link.nested {
+  padding-left: 0 !important;
+  padding-right: 13px !important;
+}
+
+html[dir='rtl'] .VPDocOutlineItem .nested {
+  padding-left: 0 !important;
+  padding-right: 16px !important;
+}
+
 /* Doc content RTL polish */
 html[lang='fa-IR'] .vp-doc th,
 html[lang='fa-IR'] .vp-doc td {
