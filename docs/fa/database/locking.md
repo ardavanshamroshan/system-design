@@ -1,8 +1,10 @@
 # Optimistic در برابر Pessimistic Locking
 
-## مسئله
+> ماژول B — داده، همزمانی، پایداری · بخش ۳
 
-دو request همزمان همان ردیف را آپدیت می‌کنند (مثلاً موجودی). بدون کنترل:
+## چیست و چرا
+
+وقتی دو تراکنش همزمان یک ردیف را عوض می‌کنند، بدون قفل یکی دیگری را **overwrite** می‌کند (**lost update**):
 
 ```
 A reads qty=5
@@ -11,28 +13,22 @@ A writes qty=4
 B writes qty=4  ← یک decrement گم شد
 ```
 
-دو رویکرد کلاسیک: **Optimistic** و **Pessimistic**.
+دو رویکرد کلاسیک: **Pessimistic** و **Optimistic**.
 
 ---
 
 ## Pessimistic locking
 
-«اول قفل کن، بعد کار کن.»
+قبل از ویرایش قفل می‌گیری (`SELECT … FOR UPDATE`) — دیگران صبر می‌کنند.
 
 ```sql
-SELECT * FROM products WHERE id = 1 FOR UPDATE;
--- others wait on this row
-UPDATE products SET qty = qty - 1 WHERE id = 1;
+SELECT * FROM orders WHERE id = 1 FOR UPDATE;
+-- دیگران روی این ردیف منتظر می‌مانند
+UPDATE orders SET status = 'paid' WHERE id = 1;
 COMMIT;
 ```
 
-```php
-DB::transaction(function () {
-    $product = Product::whereKey(1)->lockForUpdate()->first();
-    $product->qty -= 1;
-    $product->save();
-});
-```
+«اول قفل کن، بعد کار کن.»
 
 | مزیت | هزینه |
 |------|-------|
@@ -43,46 +39,74 @@ DB::transaction(function () {
 
 ## Optimistic locking
 
-«بدون قفل بخوان؛ موقع نوشتن چک کن version عوض نشده باشد.»
+قفل نمی‌گیری؛ با `version` / `updated_at` بررسی می‌کنی که کسی وسط کار عوض نکرده باشد.
 
-معمولاً ستون `version` یا `updated_at`:
-
-```sql
-UPDATE products
-SET qty = 4, version = version + 1
-WHERE id = 1 AND version = 3;
--- if 0 rows → someone wrote first; retry
+```
+WriterA                Database                WriterB
+   |                      |                       |
+   |-- read version=1 --->|                       |
+   |                      |<--- read version=1 ---|
+   |                      |                       |
+   |-- update if v=1 ---->|                       |
+   |   set version=2      |                       |
+   |<----- OK ------------|                       |
+   |                      |<--- update if v=1 ----|
+   |                      |---- 0 rows / conflict>|
 ```
 
-```php
-$product = Product::find(1);
-$affected = Product::where('id', $product->id)
-    ->where('version', $product->version)
-    ->update([
-        'qty' => $product->qty - 1,
-        'version' => $product->version + 1,
-    ]);
-
-if ($affected === 0) {
-    throw new ConflictException('Retry');
-}
+```sql
+UPDATE orders
+SET status = 'paid', version = version + 1
+WHERE id = 1 AND version = 1;
+-- اگر 0 ردیف → کسی زودتر نوشته؛ conflict / retry
 ```
 
 | مزیت | هزینه |
 |------|-------|
 | بدون قفل بلندمدت | زیر تعارض بالا، retry زیاد |
-| برای مسیرهای read-heavy بهتر مقیاس می‌شود | UX باید تعارض را هندل کند |
+| برای مسیرهای کم‌تعارض مقیاس بهتر | UX باید تعارض را هندل کند |
 
 ---
 
-## کی کدام را؟
+## بده‌بستان
 
-| سناریو | انتخاب رایج |
-|--------|-------------|
-| موجودی محدود، صندلی کنسرت | Pessimistic یا `UPDATE ... WHERE qty > 0` اتمیک |
-| ویرایش پروفایل کم‌تعارض | Optimistic |
-| تراکنش مالی حساس با ردیف‌های مرتبط | Pessimistic با ترتیب قفل ثابت |
-| سند مشترک با تداخل نادر | Optimistic + merge |
+| رویکرد | مناسب برای |
+|--------|------------|
+| **Optimistic** | contention پایین — مثلاً پروفایل کاربر |
+| **Pessimistic** | conflict زیاد — موجودی انبار / رزرو صندلی |
+
+---
+
+## کد Laravel
+
+### Pessimistic
+
+```php
+DB::transaction(function () use ($orderId) {
+    $order = Order::whereKey($orderId)->lockForUpdate()->firstOrFail();
+    $order->status = 'paid';
+    $order->save();
+});
+```
+
+### Optimistic — ستون `version` روی جدول
+
+```php
+DB::transaction(function () use ($orderId, $payload) {
+    $order = Order::findOrFail($orderId);
+
+    $affected = Order::whereKey($order->id)
+        ->where('version', $order->version)
+        ->update([
+            ...$payload,
+            'version' => $order->version + 1,
+        ]);
+
+    if ($affected === 0) {
+        throw new \RuntimeException('Conflict: order changed by another request');
+    }
+});
+```
 
 ---
 
@@ -96,12 +120,13 @@ SET balance = balance - 100
 WHERE id = 9 AND balance >= 100;
 ```
 
-این الگو ساده و قدرتمند است.
+این الگو ساده و قدرتمند است — مخصوصاً برای موجودی/موجودی‌مانند.
 
 ---
 
 ## قاعدهٔ تصمیم
 
-1. نرخ تعارض را تخمین بزن. بالا → pessimistic / اتمیک. پایین → optimistic.  
-2. همیشه برای deadlock و retry بودجه بگذار.  
-3. قفل را کوتاه نگه دار؛ HTTP خارجی داخل تراکنش نزن.
+1. **conflict نادر** → optimistic  
+2. **صحت مالی / موجودی حیاتی و race زیاد** → pessimistic (+ تراکنش کوتاه)  
+3. همیشه برای deadlock و retry بودجه بگذار.  
+4. قفل را کوتاه نگه دار؛ HTTP خارجی داخل تراکنش نزن.

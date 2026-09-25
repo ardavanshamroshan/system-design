@@ -1,8 +1,10 @@
 # Optimistic vs Pessimistic Locking
 
-## The problem
+> Module B — Data, Concurrency, Durability · Section 3
 
-Two concurrent requests update the same row (e.g. inventory). Without control:
+## What and why
+
+When two transactions update the same row at once, without a lock one overwrites the other (**lost update**):
 
 ```
 A reads qty=5
@@ -11,28 +13,22 @@ A writes qty=4
 B writes qty=4  ← one decrement was lost
 ```
 
-Two classic approaches: **Optimistic** and **Pessimistic**.
+Two classic approaches: **Pessimistic** and **Optimistic**.
 
 ---
 
 ## Pessimistic locking
 
-“Lock first, then work.”
+Lock before you edit (`SELECT … FOR UPDATE`) — others wait.
 
 ```sql
-SELECT * FROM products WHERE id = 1 FOR UPDATE;
+SELECT * FROM orders WHERE id = 1 FOR UPDATE;
 -- others wait on this row
-UPDATE products SET qty = qty - 1 WHERE id = 1;
+UPDATE orders SET status = 'paid' WHERE id = 1;
 COMMIT;
 ```
 
-```php
-DB::transaction(function () {
-    $product = Product::whereKey(1)->lockForUpdate()->first();
-    $product->qty -= 1;
-    $product->save();
-});
-```
+“Lock first, then work.”
 
 | Upside | Cost |
 |--------|------|
@@ -43,46 +39,74 @@ DB::transaction(function () {
 
 ## Optimistic locking
 
-“Read without a lock; at write time check the version hasn’t changed.”
+No lock; check with `version` / `updated_at` that nobody changed the row mid-flight.
 
-Usually a `version` or `updated_at` column:
-
-```sql
-UPDATE products
-SET qty = 4, version = version + 1
-WHERE id = 1 AND version = 3;
--- if 0 rows → someone wrote first; retry
+```
+WriterA                Database                WriterB
+   |                      |                       |
+   |-- read version=1 --->|                       |
+   |                      |<--- read version=1 ---|
+   |                      |                       |
+   |-- update if v=1 ---->|                       |
+   |   set version=2      |                       |
+   |<----- OK ------------|                       |
+   |                      |<--- update if v=1 ----|
+   |                      |---- 0 rows / conflict>|
 ```
 
-```php
-$product = Product::find(1);
-$affected = Product::where('id', $product->id)
-    ->where('version', $product->version)
-    ->update([
-        'qty' => $product->qty - 1,
-        'version' => $product->version + 1,
-    ]);
-
-if ($affected === 0) {
-    throw new ConflictException('Retry');
-}
+```sql
+UPDATE orders
+SET status = 'paid', version = version + 1
+WHERE id = 1 AND version = 1;
+-- if 0 rows → someone wrote first; conflict / retry
 ```
 
 | Upside | Cost |
 |--------|------|
 | No long-held locks | Many retries under high conflict |
-| Scales better for read-heavy paths | UX must handle conflict |
+| Scales better for low-contention paths | UX must handle conflict |
 
 ---
 
-## When to use which
+## Trade-off
 
-| Scenario | Common choice |
-|----------|---------------|
-| Limited inventory, concert seats | Pessimistic or atomic `UPDATE ... WHERE qty > 0` |
-| Low-conflict profile edits | Optimistic |
-| Sensitive financial txs with related rows | Pessimistic with fixed lock order |
-| Collaborative docs with rare overlap | Optimistic + merge |
+| Approach | Fits |
+|----------|------|
+| **Optimistic** | Low contention — e.g. user profile |
+| **Pessimistic** | High conflict — inventory / seat reservation |
+
+---
+
+## Laravel code
+
+### Pessimistic
+
+```php
+DB::transaction(function () use ($orderId) {
+    $order = Order::whereKey($orderId)->lockForUpdate()->firstOrFail();
+    $order->status = 'paid';
+    $order->save();
+});
+```
+
+### Optimistic — `version` column on the table
+
+```php
+DB::transaction(function () use ($orderId, $payload) {
+    $order = Order::findOrFail($orderId);
+
+    $affected = Order::whereKey($order->id)
+        ->where('version', $order->version)
+        ->update([
+            ...$payload,
+            'version' => $order->version + 1,
+        ]);
+
+    if ($affected === 0) {
+        throw new \RuntimeException('Conflict: order changed by another request');
+    }
+});
+```
 
 ---
 
@@ -96,12 +120,13 @@ SET balance = balance - 100
 WHERE id = 9 AND balance >= 100;
 ```
 
-This pattern is simple and powerful.
+Simple and powerful — especially for inventory-like counters.
 
 ---
 
 ## Decision rule
 
-1. Estimate conflict rate. High → pessimistic / atomic. Low → optimistic.  
-2. Always budget for deadlock and retry.  
-3. Keep locks short; don’t do external HTTP inside a transaction.
+1. **Rare conflict** → optimistic  
+2. **Financial / inventory correctness + heavy races** → pessimistic (+ short transactions)  
+3. Always budget for deadlock and retry.  
+4. Keep locks short; don’t do external HTTP inside a transaction.
