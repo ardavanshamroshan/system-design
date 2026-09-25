@@ -2,6 +2,12 @@ import { defineConfig, type DefaultTheme } from 'vitepress'
 
 const base = '/system-design/'
 
+const authorFooterEn =
+  'Built by <a href="https://ardavanshamroshan.ir" target="_blank" rel="noopener">Ardavan ShamRoshan</a> · <a href="https://github.com/ardavanshamroshan" target="_blank" rel="noopener">GitHub</a>'
+
+const authorFooterFa =
+  'ساخته‌شده توسط <a href="https://ardavanshamroshan.ir" target="_blank" rel="noopener">Ardavan ShamRoshan</a> · <a href="https://github.com/ardavanshamroshan" target="_blank" rel="noopener">GitHub</a>'
+
 const enSidebar: DefaultTheme.Sidebar = [
   {
     text: 'Fundamentals & Algorithms',
@@ -45,6 +51,53 @@ const enSidebar: DefaultTheme.Sidebar = [
     text: 'DevOps',
     items: [
       { text: 'Docker Compose Environments', link: '/devops/docker-compose-profiles' },
+    ],
+  },
+]
+
+const faSidebar: DefaultTheme.Sidebar = [
+  {
+    text: 'مبانی و الگوریتم‌ها',
+    items: [
+      { text: 'نماد Big O', link: '/fa/fundamentals/big-o' },
+      { text: 'Quick Sort و Binary Search', link: '/fa/fundamentals/sorting-search' },
+    ],
+  },
+  {
+    text: 'الگوهای نرم‌افزاری',
+    items: [
+      { text: 'CQRS و الگوهای سبک', link: '/fa/patterns/cqrs' },
+      { text: 'کلاس Directory Query', link: '/fa/patterns/directory-query' },
+      { text: 'Cache Aside / Read-Write Through', link: '/fa/patterns/cache-patterns' },
+      { text: 'الگوی Outbox', link: '/fa/patterns/outbox' },
+    ],
+  },
+  {
+    text: 'معماری سیستم',
+    items: [
+      { text: 'API Gateway', link: '/fa/architecture/api-gateway' },
+      { text: 'قضیه CAP', link: '/fa/architecture/cap-theorem' },
+    ],
+  },
+  {
+    text: 'پیام‌رسانی',
+    items: [
+      { text: 'صف Dead-Letter (DLQ)', link: '/fa/messaging/dlq' },
+      { text: 'Kafka / RabbitMQ / Redis Streams', link: '/fa/messaging/brokers' },
+      { text: 'تأیید پیام (Ack)', link: '/fa/messaging/acknowledgment' },
+    ],
+  },
+  {
+    text: 'دیتابیس',
+    items: [
+      { text: 'Connection Pooling', link: '/fa/database/connection-pool' },
+      { text: 'قفل Optimistic و Pessimistic', link: '/fa/database/locking' },
+    ],
+  },
+  {
+    text: 'DevOps',
+    items: [
+      { text: 'محیط‌های Docker Compose', link: '/fa/devops/docker-compose-profiles' },
     ],
   },
 ]
@@ -101,7 +154,7 @@ export default defineConfig({
         ],
         sidebar: enSidebar,
         footer: {
-          message: 'System Design & Software Architecture',
+          message: authorFooterEn,
           copyright: 'Educational docs — free to learn and share',
         },
       },
@@ -142,16 +195,9 @@ export default defineConfig({
         socialLinks: [
           { icon: 'github', link: 'https://github.com/ardavanshamroshan/system-design' },
         ],
-        sidebar: [
-          {
-            text: 'مبانی و الگوریتم‌ها',
-            items: [
-              { text: 'نماد Big O', link: '/fa/fundamentals/big-o' },
-            ],
-          },
-        ],
+        sidebar: faSidebar,
         footer: {
-          message: 'طراحی سیستم و معماری نرم‌افزار',
+          message: authorFooterFa,
           copyright: 'مستندات آموزشی — آزاد برای یادگیری و اشتراک',
         },
         darkModeSwitchLabel: 'ظاهر',

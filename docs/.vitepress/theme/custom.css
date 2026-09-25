@@ -187,11 +187,11 @@
   }
 
   .VPNavBar.has-sidebar .container {
-    border-left: 1px solid var(--color-sand-light-5);
+    border-inline-start: 1px solid var(--color-sand-light-5);
   }
 
   .dark .VPNavBar.has-sidebar .container {
-    border-left-color: var(--color-sand-dark-5);
+    border-inline-start-color: var(--color-sand-dark-5);
   }
 }
 
@@ -205,12 +205,30 @@
 
 .VPNavBarTitle .logo {
   height: 1.35rem;
-  margin-right: 0.5rem;
+  margin-inline-end: 0.5rem;
 }
 
 .VPNavBar .content-body {
   background: transparent !important;
   backdrop-filter: none !important;
+  gap: 0.75rem;
+}
+
+/* Even spacing: drop VitePress uneven divider margins; use flex gap */
+.VPNavBar .menu + .translations::before,
+.VPNavBar .menu + .appearance::before,
+.VPNavBar .menu + .social-links::before,
+.VPNavBar .translations + .appearance::before,
+.VPNavBar .appearance + .social-links::before {
+  display: none !important;
+  content: none !important;
+  margin: 0 !important;
+  width: 0 !important;
+}
+
+.VPNavBar .social-links {
+  margin-inline-end: 0 !important;
+  margin-right: 0 !important;
 }
 
 .VPNavBarMenuLink {
@@ -913,7 +931,8 @@
 /* Content container width */
 @media (min-width: 960px) {
   .VPContent.has-sidebar {
-    padding-left: var(--vp-sidebar-width) !important;
+    padding-inline-start: var(--vp-sidebar-width) !important;
+    padding-left: unset;
   }
 }
 
@@ -931,7 +950,7 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Locale FA — Rubik on chrome + content (sidebar, outline, nav, doc)         */
+/* Locale FA / RTL — mirror LTR chrome (nav, sidebar, content, outline)       */
 /* -------------------------------------------------------------------------- */
 
 html[lang='fa-IR'] {
@@ -945,16 +964,130 @@ html[lang='fa-IR'] .VPDoc,
 html[lang='fa-IR'] .VPDocAside,
 html[lang='fa-IR'] .VPLocalNav,
 html[lang='fa-IR'] .VPFooter,
+html[lang='fa-IR'] .VPHome,
 html[lang='fa-IR'] .VPNavBarTitle .title,
 html[lang='fa-IR'] .VPNavBarMenuLink,
 html[lang='fa-IR'] .VPSidebarItem .text,
 html[lang='fa-IR'] .VPDocOutlineItem .outline-link,
 html[lang='fa-IR'] .VPDocAside .outline-title,
 html[lang='fa-IR'] .vp-doc,
-html[lang='fa-IR'] .lang-tabs {
+html[lang='fa-IR'] .lang-tabs,
+html[lang='fa-IR'] .site-author {
   font-family: 'Rubik', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
 }
 
+/* --- Skeleton: sidebar on the right, content padded on the right --- */
+html[dir='rtl'] .VPSidebar {
+  left: auto !important;
+  right: 0 !important;
+  border-right: none !important;
+  border-left: 1px solid var(--color-sand-light-5);
+  transform: translateX(100%);
+}
+
+html.dark[dir='rtl'] .VPSidebar {
+  border-left-color: var(--color-sand-dark-5);
+}
+
+html[dir='rtl'] .VPSidebar.open {
+  transform: translateX(0) !important;
+}
+
+@media (min-width: 960px) {
+  html[dir='rtl'] .VPSidebar {
+    transform: translateX(0) !important;
+  }
+}
+
+@media (min-width: 960px) {
+  html[dir='rtl'] .VPContent.has-sidebar {
+    padding-inline-start: 0 !important;
+    padding-inline-end: var(--vp-sidebar-width) !important;
+    padding-left: 0 !important;
+    padding-right: var(--vp-sidebar-width) !important;
+  }
+}
+
+/* --- Nav: logo block on the right (RTL start) --- */
+@media (min-width: 960px) {
+  html[dir='rtl'] .VPNavBar.has-sidebar .title {
+    left: auto !important;
+    right: 0 !important;
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+
+  html[dir='rtl'] .VPNavBar.has-sidebar .content {
+    padding-left: 32px !important;
+    padding-right: var(--vp-sidebar-width) !important;
+  }
+
+  html[dir='rtl'] .VPNavBar.has-sidebar .divider {
+    padding-left: 0 !important;
+    padding-right: var(--vp-sidebar-width) !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  html[dir='rtl'] .VPNavBar.has-sidebar .title {
+    padding-right: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2)) !important;
+    padding-left: 32px !important;
+    width: calc((100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px) !important;
+  }
+
+  html[dir='rtl'] .VPNavBar.has-sidebar .content {
+    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px) !important;
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)) !important;
+  }
+
+  html[dir='rtl'] .VPNavBar.has-sidebar .divider {
+    padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)) !important;
+  }
+
+  html[dir='rtl'] .VPSidebar {
+    padding-right: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2)) !important;
+    padding-left: 32px !important;
+    width: calc((100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px) !important;
+  }
+}
+
+html[dir='rtl'] .VPNavBarTitle .logo {
+  margin-inline-end: 0.5rem;
+  margin-inline-start: 0;
+}
+
+/* Nav actions: equal row gap (Docs / GitHub / lang / theme) */
+html[dir='rtl'] .VPNavBar .content-body,
+html[lang='fa-IR'] .VPNavBar .content-body {
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+html[dir='rtl'] .VPNavBar .content-body > .search,
+html[dir='rtl'] .VPNavBar .content-body > .menu,
+html[dir='rtl'] .VPNavBar .content-body > .translations,
+html[dir='rtl'] .VPNavBar .content-body > .appearance,
+html[dir='rtl'] .VPNavBar .content-body > .social-links {
+  margin: 0 !important;
+}
+
+html[dir='rtl'] .VPNavBarMenu {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+html[dir='rtl'] .VPSidebarItem.level-1 .item {
+  padding: 0.35rem 0.85rem 0.35rem 0;
+}
+
+html[dir='rtl'] .VPSidebarItem.level-1 .item > .indicator {
+  left: auto;
+  right: 0;
+}
+
+/* Doc content RTL polish */
 html[lang='fa-IR'] .vp-doc th,
 html[lang='fa-IR'] .vp-doc td {
   text-align: right;
@@ -1019,29 +1152,7 @@ html[lang='fa-IR'] .vp-doc :not(pre) > code {
   font-family: var(--vp-font-family-mono) !important;
 }
 
-/* FA sidebar / outline chrome — mirror LTR accents */
-html[lang='fa-IR'] .VPSidebar {
-  border-right: none;
-  border-left: 1px solid var(--color-sand-light-5);
-}
-
-html.dark[lang='fa-IR'] .VPSidebar {
-  border-left-color: var(--color-sand-dark-5);
-}
-
-html[lang='fa-IR'] .VPSidebarItem.level-1 .item {
-  padding: 0.35rem 0.85rem 0.35rem 0;
-}
-
-html[lang='fa-IR'] .VPSidebarItem.level-1 .item > .indicator {
-  left: auto;
-  right: 0;
-}
-
-html[lang='fa-IR'] .VPNavBarTitle .logo {
-  margin-right: 0;
-  margin-left: 0.5rem;
-}
+/* Language tabs */
 .lang-tabs {
   display: inline-flex;
   gap: 0.25rem;
@@ -1078,4 +1189,59 @@ html[lang='fa-IR'] .VPNavBarTitle .logo {
 .lang-tabs__tab.is-active:hover {
   background: #c42602;
   color: #fff !important;
+}
+
+/* Author — sidebar bottom + footer links */
+.site-author {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.site-author__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vp-c-text-3);
+}
+
+.site-author__name {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-laravel-red) !important;
+  text-decoration: none !important;
+  line-height: 1.35;
+}
+
+.site-author__name:hover {
+  text-decoration: underline !important;
+  text-underline-offset: 0.15em;
+}
+
+.site-author__github {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--vp-c-text-2) !important;
+  text-decoration: none !important;
+}
+
+.site-author__github:hover {
+  color: var(--vp-c-text-1) !important;
+  text-decoration: underline !important;
+}
+
+.VPFooter .message a {
+  color: var(--color-laravel-red);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.VPFooter .message a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }

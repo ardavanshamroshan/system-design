@@ -8,27 +8,25 @@ const isFa = computed(() => lang.value.startsWith('fa'))
 
 const relative = computed(() => page.value.relativePath.replace(/\\/g, '/'))
 
-/** Map current page → EN/FA counterparts (locale path without base). */
+/** Every page has EN + FA counterparts under the same relative path. */
 const pair = computed(() => {
   const rel = relative.value
-  if (rel === 'fundamentals/big-o.md' || rel === 'fa/fundamentals/big-o.md') {
-    return { en: '/fundamentals/big-o', fa: '/fa/fundamentals/big-o' }
-  }
   if (rel === 'index.md' || rel === 'fa/index.md') {
     return { en: '/', fa: '/fa/' }
   }
-  return null
+  const bare = rel.replace(/^fa\//, '').replace(/\.md$/, '')
+  return {
+    en: `/${bare}`,
+    fa: `/fa/${bare}`,
+  }
 })
 
-const show = computed(() => pair.value !== null)
-
-const enHref = computed(() => withBase(pair.value?.en ?? '/'))
-const faHref = computed(() => withBase(pair.value?.fa ?? '/fa/'))
+const enHref = computed(() => withBase(pair.value.en))
+const faHref = computed(() => withBase(pair.value.fa))
 </script>
 
 <template>
   <div
-    v-if="show"
     class="lang-tabs"
     role="tablist"
     aria-label="Language"
