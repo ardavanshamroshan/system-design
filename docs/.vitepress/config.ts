@@ -21,7 +21,7 @@ const enSidebar: DefaultTheme.Sidebar = [
     text: 'Software Patterns',
     items: [
       { text: 'CQRS Light', link: '/patterns/cqrs' },
-      { text: 'Directory Query Class', link: '/patterns/directory-query' },
+      { text: 'Directory / Query Class', link: '/patterns/directory-query' },
       { text: 'Cache Aside / Read-Write Through', link: '/patterns/cache-patterns' },
       { text: 'Outbox Pattern', link: '/patterns/outbox' },
     ],
@@ -52,7 +52,7 @@ const enSidebar: DefaultTheme.Sidebar = [
   {
     text: 'DevOps',
     items: [
-      { text: 'Docker Compose Environments', link: '/devops/docker-compose-profiles' },
+      { text: 'Compose Profiles & Profiling', link: '/devops/docker-compose-profiles' },
     ],
   },
 ]
@@ -70,7 +70,7 @@ const faSidebar: DefaultTheme.Sidebar = [
     text: 'الگوهای نرم‌افزاری',
     items: [
       { text: 'CQRS Light', link: '/fa/patterns/cqrs' },
-      { text: 'کلاس Directory Query', link: '/fa/patterns/directory-query' },
+      { text: 'کلاس Directory / Query', link: '/fa/patterns/directory-query' },
       { text: 'Cache Aside / Read-Write Through', link: '/fa/patterns/cache-patterns' },
       { text: 'الگوی Outbox', link: '/fa/patterns/outbox' },
     ],
@@ -101,7 +101,7 @@ const faSidebar: DefaultTheme.Sidebar = [
   {
     text: 'DevOps',
     items: [
-      { text: 'محیط‌های Docker Compose', link: '/fa/devops/docker-compose-profiles' },
+      { text: 'Compose Profiles و Profiling', link: '/fa/devops/docker-compose-profiles' },
     ],
   },
 ]

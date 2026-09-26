@@ -14,12 +14,12 @@ hero:
       link: https://github.com/ardavanshamroshan/system-design
 
 features:
-  - title: مبانی
-    details: Big O، Sort/Search، Hash، BFS/DFS، Window
-  - title: الگوها
-    details: CQRS، Cache، Outbox، Directory Query
-  - title: معماری
-    details: API Gateway، CAP، بروکرهای پیام
-  - title: داده و عملیات
-    details: Pooling، locking، پروفایل‌های Compose
+  - title: A — مبانی
+    details: Big O، Sort/Search — حرف زدن از هزینهٔ مقیاس
+  - title: B — داده
+    details: Lock، Pool، Cache — صحت و عملکرد
+  - title: C — پیام‌رسانی
+    details: Broker، Ack، DLQ، Outbox — قابلیت اطمینان async
+  - title: D / E — معماری و Ops
+    details: CAP، Gateway، CQRS، Query · Compose profiles
 ---

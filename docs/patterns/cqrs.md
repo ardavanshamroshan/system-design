@@ -1,6 +1,6 @@
 # CQRS Light
 
-> Module E — Software Patterns · Section 12
+> Module D — System Architecture · Section 12
 
 ## Mental outline
 

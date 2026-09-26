@@ -14,12 +14,12 @@ hero:
       link: https://github.com/ardavanshamroshan/system-design
 
 features:
-  - title: Fundamentals
-    details: Big O, Sort/Search, Hash, BFS/DFS, Window
-  - title: Patterns
-    details: CQRS, Cache, Outbox, Directory Query
-  - title: Architecture
-    details: API Gateway, CAP, messaging brokers
-  - title: Data & Ops
-    details: Pooling, locking, Compose profiles
+  - title: A — Fundamentals
+    details: Big O, Sort/Search — talk about scale cost
+  - title: B — Data
+    details: Lock, Pool, Cache — correctness and performance
+  - title: C — Messaging
+    details: Broker, Ack, DLQ, Outbox — async reliability
+  - title: D / E — Architecture & Ops
+    details: CAP, Gateway, CQRS, Query · Compose profiles
 ---
