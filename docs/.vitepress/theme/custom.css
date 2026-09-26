@@ -1197,9 +1197,20 @@ html[dir='rtl'] .VPSidebar.open {
 @media (min-width: 960px) {
   html[dir='rtl'] .VPSidebar {
     transform: translateX(0) !important;
+    width: var(--vp-sidebar-width) !important;
   }
 
-  /* Local nav strip must clear the right-hand sidebar too */
+  /*
+   * PHYSICAL padding only for RTL.
+   * Do NOT mix padding-inline-* with padding-left/right + unset —
+   * in RTL inline-start maps to padding-right; a later `padding-right: unset`
+   * wipes the sidebar gutter (ultrawide bug).
+   */
+  html[dir='rtl'] .VPContent.has-sidebar {
+    padding-left: 0 !important;
+    padding-right: var(--vp-sidebar-width) !important;
+  }
+
   html[dir='rtl'] .VPLocalNav.has-sidebar {
     padding-left: 32px !important;
     padding-right: var(--vp-sidebar-width) !important;
@@ -1207,32 +1218,26 @@ html[dir='rtl'] .VPSidebar.open {
 }
 
 @media (min-width: 1440px) {
+  html[dir='rtl'] .VPContent.has-sidebar {
+    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2) !important;
+    padding-right: calc(
+      (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)
+    ) !important;
+  }
+
   html[dir='rtl'] .VPLocalNav.has-sidebar {
     padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px) !important;
     padding-right: calc(
       (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)
     ) !important;
   }
-}
 
-@media (min-width: 960px) {
-  html[dir='rtl'] .VPContent.has-sidebar {
-    /* Sidebar sits on the RIGHT → pad inline-start (right in RTL) */
-    padding-inline-start: var(--vp-sidebar-width) !important;
-    padding-inline-end: 0 !important;
-    padding-left: 0 !important;
-    padding-right: var(--vp-sidebar-width) !important;
-  }
-}
-
-@media (min-width: 1440px) {
-  html[dir='rtl'] .VPContent.has-sidebar {
-    padding-inline-start: calc(
-      (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)
+  html[dir='rtl'] .VPSidebar {
+    padding-right: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2)) !important;
+    padding-left: 32px !important;
+    width: calc(
+      (100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px
     ) !important;
-    padding-inline-end: calc((100vw - var(--vp-layout-max-width)) / 2) !important;
-    padding-left: unset !important;
-    padding-right: unset !important;
   }
 }
 
@@ -1270,12 +1275,6 @@ html[dir='rtl'] .VPSidebar.open {
 
   html[dir='rtl'] .VPNavBar.has-sidebar .divider {
     padding-right: calc((100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)) !important;
-  }
-
-  html[dir='rtl'] .VPSidebar {
-    padding-right: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2)) !important;
-    padding-left: 32px !important;
-    width: calc((100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px) !important;
   }
 }
 
