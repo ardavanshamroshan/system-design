@@ -59,6 +59,7 @@
 
   --vp-nav-height: 4rem;
   --vp-sidebar-width: 260px;
+  --vp-layout-max-width: 1440px;
   --vp-code-block-bg: var(--color-code-bg);
   --vp-code-copy-code-bg: transparent;
   --vp-code-copy-code-hover-bg: color-mix(in oklab, #fff 8%, transparent);
@@ -172,9 +173,14 @@
 
 .VPNavBar .container,
 .VPNavBar .wrapper {
-  max-width: 1400px;
   margin-inline: auto;
   height: 100%;
+}
+
+/* Cap width only on home / pages without sidebar — docs need full-bleed nav shell */
+.VPNavBar:not(.has-sidebar) .container,
+.VPNavBar:not(.has-sidebar) .wrapper {
+  max-width: 1400px;
 }
 
 .VPNavBar .container {
@@ -182,16 +188,16 @@
 }
 
 @media (min-width: 1280px) {
-  .VPNavBar .container {
+  .VPNavBar:not(.has-sidebar) .container {
     padding-inline: 4rem;
   }
+}
 
+/* Docs nav: no extra inline padding — VitePress positions title/content for sidebar */
+@media (min-width: 960px) {
   .VPNavBar.has-sidebar .container {
-    border-inline-start: 1px solid var(--color-sand-light-5);
-  }
-
-  .dark .VPNavBar.has-sidebar .container {
-    border-inline-start-color: var(--color-sand-dark-5);
+    padding-inline: 0;
+    max-width: 100%;
   }
 }
 
@@ -311,6 +317,16 @@
 
   .dark .VPSidebar .curtain {
     background-color: var(--color-sand-dark-1) !important;
+  }
+}
+
+/* Ultrawide: restore VitePress centered shell so sidebar isn't crushed under content */
+@media (min-width: 1440px) {
+  .VPSidebar {
+    padding-left: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2)) !important;
+    width: calc(
+      (100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px
+    ) !important;
   }
 }
 
@@ -941,11 +957,22 @@
   color: var(--vp-c-text-3);
 }
 
-/* Content container width */
+/* Content container width — match VitePress sidebar gutter at each breakpoint */
 @media (min-width: 960px) {
   .VPContent.has-sidebar {
     padding-inline-start: var(--vp-sidebar-width) !important;
     padding-left: unset;
+  }
+}
+
+@media (min-width: 1440px) {
+  .VPContent.has-sidebar {
+    padding-inline-start: calc(
+      (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)
+    ) !important;
+    padding-inline-end: calc((100vw - var(--vp-layout-max-width)) / 2) !important;
+    padding-left: unset;
+    padding-right: unset;
   }
 }
 
@@ -1101,12 +1128,14 @@ body {
   .Layout .VPContent.has-sidebar {
     padding-top: var(--vp-nav-height) !important;
   }
-}
 
-/* Wide screens: comfortable gutters without crushing sidebar */
-@media (min-width: 1280px) {
-  .VPNavBar .container {
-    padding-inline: 4rem;
+  /* Desktop tokens: nav 30, sidebar 25 — keep chrome above doc surface */
+  .Layout .VPNav {
+    z-index: var(--vp-z-index-nav) !important;
+  }
+
+  .Layout .VPSidebar {
+    z-index: var(--vp-z-index-sidebar) !important;
   }
 }
 
@@ -1177,6 +1206,17 @@ html[dir='rtl'] .VPSidebar.open {
     padding-inline-end: var(--vp-sidebar-width) !important;
     padding-left: 0 !important;
     padding-right: var(--vp-sidebar-width) !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  html[dir='rtl'] .VPContent.has-sidebar {
+    padding-inline-start: calc((100vw - var(--vp-layout-max-width)) / 2) !important;
+    padding-inline-end: calc(
+      (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)
+    ) !important;
+    padding-left: unset !important;
+    padding-right: unset !important;
   }
 }
 
