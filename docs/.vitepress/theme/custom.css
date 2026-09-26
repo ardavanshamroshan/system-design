@@ -282,7 +282,8 @@
 /* -------------------------------------------------------------------------- */
 
 .VPSidebar {
-  z-index: 25 !important;
+  /* Keep VitePress token: 60 mobile (above backdrop), 25 desktop */
+  z-index: var(--vp-z-index-sidebar) !important;
   background: var(--color-sand-light-1) !important;
   border-right: 1px solid var(--color-sand-light-5);
   scrollbar-width: thin;
@@ -539,9 +540,12 @@
 .vp-doc table {
   border-collapse: collapse;
   width: 100%;
+  max-width: 100%;
   margin: 1.25rem 0 1.75rem;
   font-size: 0.8125rem;
-  display: table;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .vp-doc th,
@@ -619,6 +623,8 @@
   border: 1px solid var(--color-sand-dark-5);
   padding: 0.3rem !important;
   box-shadow: none;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .dark .vp-doc div[class*='language-'] {
@@ -764,6 +770,8 @@
   letter-spacing: -0.03em !important;
   line-height: 1.1 !important;
   color: var(--color-laravel-red) !important;
+  max-width: 100% !important;
+  width: auto !important;
 }
 
 .VPHero .text {
@@ -772,18 +780,21 @@
   letter-spacing: -0.02em !important;
   line-height: 1.25 !important;
   color: var(--vp-c-text-1) !important;
-  max-width: 26rem;
+  max-width: min(26rem, 100%);
+  width: auto !important;
 }
 
 .VPHero .tagline {
   font-size: 0.9rem !important;
   line-height: 1.5 !important;
   color: var(--vp-c-text-2) !important;
-  max-width: 30rem;
+  max-width: min(30rem, 100%);
   margin-top: 0.65rem !important;
 }
 
 .VPHero .actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
   gap: 0.5rem !important;
   margin-top: 1.1rem !important;
   padding-top: 0 !important;
@@ -830,7 +841,9 @@
 }
 
 .VPFeatures {
-  padding: 1.25rem 0 0.5rem !important;
+  /* Keep VitePress horizontal gutters; only tighten vertical rhythm */
+  padding-top: 1.25rem !important;
+  padding-bottom: 0.5rem !important;
 }
 
 .VPFeatures .container {
@@ -947,6 +960,165 @@
 
 ::selection {
   background: color-mix(in oklab, var(--color-laravel-red) 22%, transparent);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Responsive — mobile / tablet / desktop                                     */
+/* -------------------------------------------------------------------------- */
+
+html,
+body {
+  overflow-x: clip;
+}
+
+.Layout {
+  min-width: 0;
+}
+
+.vp-doc {
+  max-width: 65ch;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.VPDoc .content-container {
+  max-width: min(52rem, 100%) !important;
+  min-width: 0;
+}
+
+/* Doc page denser on phones */
+@media (max-width: 767px) {
+  .VPDoc {
+    padding-top: 1rem !important;
+  }
+
+  .vp-doc h1 {
+    font-size: 1.65rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .vp-doc h2 {
+    font-size: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  .vp-doc h3 {
+    font-size: 1.05rem;
+  }
+
+  .vp-doc p,
+  .vp-doc li {
+    font-size: 0.9rem;
+  }
+
+  /* Negative # anchors cause horizontal bleed on narrow screens */
+  .vp-doc .header-anchor {
+    display: none;
+  }
+
+  .vp-doc div[class*='language-'] > pre {
+    padding: 0.85rem 0.9rem !important;
+    font-size: 12px;
+  }
+
+  .vp-doc div[class*='language-'].line-numbers-mode > pre {
+    padding-left: 2.75rem !important;
+  }
+
+  .vp-doc .line-numbers-wrapper {
+    width: 2.1rem;
+    font-size: 12px;
+    padding-top: 0.85rem;
+  }
+
+  /* Compact top chrome */
+  .VPNavBarSearch .DocSearch-Button {
+    width: 2.25rem;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .VPNavBarTitle .title {
+    font-size: 0.875rem;
+    max-width: 42vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .VPNavBarTitle .logo {
+    height: 1.2rem;
+    margin-inline-end: 0.35rem;
+  }
+
+  .VPHero.VPHomeHero {
+    padding: 1.75rem 1.25rem 1rem !important;
+  }
+
+  .VPFeature .box {
+    padding: 0.9rem 1rem !important;
+  }
+
+  .VPDocFooter .pager-link {
+    padding: 0.65rem 0.85rem;
+  }
+
+  .lang-tabs {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+@media (max-width: 419px) {
+  .VPNavBar .container {
+    padding-inline: 0.75rem;
+  }
+
+  .VPNavBarTitle .title {
+    max-width: 36vw;
+  }
+
+  .VPButton.medium {
+    padding: 0.45rem 0.75rem !important;
+  }
+}
+
+/* Tablet: keep nav/search usable, tighten doc */
+@media (min-width: 768px) and (max-width: 959px) {
+  .VPDoc {
+    padding-top: 1.35rem !important;
+  }
+
+  .VPHero.VPHomeHero {
+    padding: 2.25rem 2rem 1.15rem !important;
+  }
+}
+
+/* Desktop+ : ensure content never sits under fixed nav */
+@media (min-width: 960px) {
+  .Layout .VPContent,
+  .Layout .VPContent.is-home,
+  .Layout .VPContent.has-sidebar {
+    padding-top: var(--vp-nav-height) !important;
+  }
+}
+
+/* Wide screens: comfortable gutters without crushing sidebar */
+@media (min-width: 1280px) {
+  .VPNavBar .container {
+    padding-inline: 4rem;
+  }
+}
+
+/* Code / pre never blow out layout */
+.vp-doc pre,
+.vp-doc :not(pre) > code {
+  max-width: 100%;
+}
+
+.custom-block {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 /* -------------------------------------------------------------------------- */
