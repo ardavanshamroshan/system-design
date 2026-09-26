@@ -322,7 +322,7 @@
 
 /* Ultrawide: restore VitePress centered shell so sidebar isn't crushed under content */
 @media (min-width: 1440px) {
-  .VPSidebar {
+  html:not([dir='rtl']) .VPSidebar {
     padding-left: max(32px, calc((100% - (var(--vp-layout-max-width) - 64px)) / 2)) !important;
     width: calc(
       (100% - (var(--vp-layout-max-width) - 64px)) / 2 + var(--vp-sidebar-width) - 32px
@@ -959,14 +959,14 @@
 
 /* Content container width — match VitePress sidebar gutter at each breakpoint */
 @media (min-width: 960px) {
-  .VPContent.has-sidebar {
+  html:not([dir='rtl']) .VPContent.has-sidebar {
     padding-inline-start: var(--vp-sidebar-width) !important;
     padding-left: unset;
   }
 }
 
 @media (min-width: 1440px) {
-  .VPContent.has-sidebar {
+  html:not([dir='rtl']) .VPContent.has-sidebar {
     padding-inline-start: calc(
       (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)
     ) !important;
@@ -1198,12 +1198,28 @@ html[dir='rtl'] .VPSidebar.open {
   html[dir='rtl'] .VPSidebar {
     transform: translateX(0) !important;
   }
+
+  /* Local nav strip must clear the right-hand sidebar too */
+  html[dir='rtl'] .VPLocalNav.has-sidebar {
+    padding-left: 32px !important;
+    padding-right: var(--vp-sidebar-width) !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  html[dir='rtl'] .VPLocalNav.has-sidebar {
+    padding-left: calc((100vw - var(--vp-layout-max-width)) / 2 + 32px) !important;
+    padding-right: calc(
+      (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)
+    ) !important;
+  }
 }
 
 @media (min-width: 960px) {
   html[dir='rtl'] .VPContent.has-sidebar {
-    padding-inline-start: 0 !important;
-    padding-inline-end: var(--vp-sidebar-width) !important;
+    /* Sidebar sits on the RIGHT → pad inline-start (right in RTL) */
+    padding-inline-start: var(--vp-sidebar-width) !important;
+    padding-inline-end: 0 !important;
     padding-left: 0 !important;
     padding-right: var(--vp-sidebar-width) !important;
   }
@@ -1211,10 +1227,10 @@ html[dir='rtl'] .VPSidebar.open {
 
 @media (min-width: 1440px) {
   html[dir='rtl'] .VPContent.has-sidebar {
-    padding-inline-start: calc((100vw - var(--vp-layout-max-width)) / 2) !important;
-    padding-inline-end: calc(
+    padding-inline-start: calc(
       (100vw - var(--vp-layout-max-width)) / 2 + var(--vp-sidebar-width)
     ) !important;
+    padding-inline-end: calc((100vw - var(--vp-layout-max-width)) / 2) !important;
     padding-left: unset !important;
     padding-right: unset !important;
   }
