@@ -36,9 +36,10 @@ const enSidebar: DefaultTheme.Sidebar = [
   {
     text: 'Messaging',
     items: [
-      { text: 'Dead-Letter Queue (DLQ)', link: '/messaging/dlq' },
       { text: 'Kafka / RabbitMQ / Redis Streams', link: '/messaging/brokers' },
       { text: 'Message Acknowledgment', link: '/messaging/acknowledgment' },
+      { text: 'Dead-Letter Queue (DLQ)', link: '/messaging/dlq' },
+      { text: 'Outbox Pattern', link: '/patterns/outbox' },
     ],
   },
   {
@@ -84,9 +85,10 @@ const faSidebar: DefaultTheme.Sidebar = [
   {
     text: 'پیام‌رسانی',
     items: [
-      { text: 'صف Dead-Letter (DLQ)', link: '/fa/messaging/dlq' },
       { text: 'Kafka / RabbitMQ / Redis Streams', link: '/fa/messaging/brokers' },
       { text: 'تأیید پیام (Ack)', link: '/fa/messaging/acknowledgment' },
+      { text: 'صف Dead-Letter (DLQ)', link: '/fa/messaging/dlq' },
+      { text: 'الگوی Outbox', link: '/fa/patterns/outbox' },
     ],
   },
   {
