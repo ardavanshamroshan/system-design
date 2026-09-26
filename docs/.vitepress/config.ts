@@ -20,7 +20,7 @@ const enSidebar: DefaultTheme.Sidebar = [
   {
     text: 'Software Patterns',
     items: [
-      { text: 'CQRS & Light Patterns', link: '/patterns/cqrs' },
+      { text: 'CQRS Light', link: '/patterns/cqrs' },
       { text: 'Directory Query Class', link: '/patterns/directory-query' },
       { text: 'Cache Aside / Read-Write Through', link: '/patterns/cache-patterns' },
       { text: 'Outbox Pattern', link: '/patterns/outbox' },
@@ -69,7 +69,7 @@ const faSidebar: DefaultTheme.Sidebar = [
   {
     text: 'الگوهای نرم‌افزاری',
     items: [
-      { text: 'CQRS و الگوهای سبک', link: '/fa/patterns/cqrs' },
+      { text: 'CQRS Light', link: '/fa/patterns/cqrs' },
       { text: 'کلاس Directory Query', link: '/fa/patterns/directory-query' },
       { text: 'Cache Aside / Read-Write Through', link: '/fa/patterns/cache-patterns' },
       { text: 'الگوی Outbox', link: '/fa/patterns/outbox' },
