@@ -8,6 +8,13 @@ const authorFooterEn =
 const authorFooterFa =
   'ساخته‌شده توسط <a href="https://ardavanshamroshan.ir" target="_blank" rel="noopener">Ardavan ShamRoshan</a> · <a href="https://github.com/ardavanshamroshan" target="_blank" rel="noopener">GitHub</a>'
 
+/** Matches NavNewBadge.vue — 7 days after 2026-09-27 (exclusive end of 2026-10-04 UTC). */
+const NEW_UNTIL_MS = Date.UTC(2026, 9, 4, 23, 59, 59)
+const showNewBadge = Date.now() <= NEW_UNTIL_MS
+
+const newMark = (label: string) => (showNewBadge ? `${label} · New` : label)
+const newMarkFa = (label: string) => (showNewBadge ? `${label} · جدید` : label)
+
 const enSidebar: DefaultTheme.Sidebar = [
   {
     text: 'Fundamentals & Algorithms',
@@ -24,13 +31,17 @@ const enSidebar: DefaultTheme.Sidebar = [
       { text: 'Directory / Query Class', link: '/patterns/directory-query' },
       { text: 'Cache Aside / Read-Write Through', link: '/patterns/cache-patterns' },
       { text: 'Outbox Pattern', link: '/patterns/outbox' },
+      { text: newMark('Saga Pattern'), link: '/patterns/saga' },
     ],
   },
   {
     text: 'System Architecture',
     items: [
-      { text: 'API Gateway', link: '/architecture/api-gateway' },
+      { text: newMark('Fallacies & PACELC'), link: '/architecture/fallacies-pacelc' },
       { text: 'CAP Theorem', link: '/architecture/cap-theorem' },
+      { text: newMark('Replication'), link: '/architecture/replication' },
+      { text: newMark('Resilience Patterns'), link: '/architecture/resilience' },
+      { text: 'API Gateway', link: '/architecture/api-gateway' },
     ],
   },
   {
@@ -40,6 +51,7 @@ const enSidebar: DefaultTheme.Sidebar = [
       { text: 'Message Acknowledgment', link: '/messaging/acknowledgment' },
       { text: 'Dead-Letter Queue (DLQ)', link: '/messaging/dlq' },
       { text: 'Outbox Pattern', link: '/patterns/outbox' },
+      { text: newMark('Saga Pattern'), link: '/patterns/saga' },
     ],
   },
   {
@@ -73,13 +85,17 @@ const faSidebar: DefaultTheme.Sidebar = [
       { text: 'کلاس Directory / Query', link: '/fa/patterns/directory-query' },
       { text: 'Cache Aside / Read-Write Through', link: '/fa/patterns/cache-patterns' },
       { text: 'الگوی Outbox', link: '/fa/patterns/outbox' },
+      { text: newMarkFa('الگوی Saga'), link: '/fa/patterns/saga' },
     ],
   },
   {
     text: 'معماری سیستم',
     items: [
-      { text: 'API Gateway', link: '/fa/architecture/api-gateway' },
+      { text: newMarkFa('Fallacyها و PACELC'), link: '/fa/architecture/fallacies-pacelc' },
       { text: 'قضیه CAP', link: '/fa/architecture/cap-theorem' },
+      { text: newMarkFa('Replication'), link: '/fa/architecture/replication' },
+      { text: newMarkFa('الگوهای Resilience'), link: '/fa/architecture/resilience' },
+      { text: 'API Gateway', link: '/fa/architecture/api-gateway' },
     ],
   },
   {
@@ -89,6 +105,7 @@ const faSidebar: DefaultTheme.Sidebar = [
       { text: 'تأیید پیام (Ack)', link: '/fa/messaging/acknowledgment' },
       { text: 'صف Dead-Letter (DLQ)', link: '/fa/messaging/dlq' },
       { text: 'الگوی Outbox', link: '/fa/patterns/outbox' },
+      { text: newMarkFa('الگوی Saga'), link: '/fa/patterns/saga' },
     ],
   },
   {
@@ -104,6 +121,18 @@ const faSidebar: DefaultTheme.Sidebar = [
       { text: 'Compose Profiles و Profiling', link: '/fa/devops/docker-compose-profiles' },
     ],
   },
+]
+
+const enNav: DefaultTheme.NavItem[] = [
+  { text: 'Docs', link: '/fundamentals/big-o' },
+  { component: 'NavNewBadge' },
+  { text: 'GitHub', link: 'https://github.com/ardavanshamroshan/system-design' },
+]
+
+const faNav: DefaultTheme.NavItem[] = [
+  { text: 'مستندات', link: '/fa/fundamentals/big-o' },
+  { component: 'NavNewBadge' },
+  { text: 'GitHub', link: 'https://github.com/ardavanshamroshan/system-design' },
 ]
 
 export default defineConfig({
@@ -149,10 +178,7 @@ export default defineConfig({
             detailedView: true,
           },
         },
-        nav: [
-          { text: 'Docs', link: '/fundamentals/big-o' },
-          { text: 'GitHub', link: 'https://github.com/ardavanshamroshan/system-design' },
-        ],
+        nav: enNav,
         socialLinks: [
           { icon: 'github', link: 'https://github.com/ardavanshamroshan/system-design' },
         ],
@@ -192,10 +218,7 @@ export default defineConfig({
             },
           },
         },
-        nav: [
-          { text: 'مستندات', link: '/fa/fundamentals/big-o' },
-          { text: 'GitHub', link: 'https://github.com/ardavanshamroshan/system-design' },
-        ],
+        nav: faNav,
         socialLinks: [
           { icon: 'github', link: 'https://github.com/ardavanshamroshan/system-design' },
         ],

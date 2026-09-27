@@ -19,7 +19,7 @@ features:
   - title: B — داده
     details: Lock، Pool، Cache — صحت و عملکرد
   - title: C — پیام‌رسانی
-    details: Broker، Ack، DLQ، Outbox — قابلیت اطمینان async
+    details: Broker، Ack، DLQ، Outbox، Saga — قابلیت اطمینان async
   - title: D / E — معماری و Ops
-    details: CAP، Gateway، CQRS، Query · Compose profiles
+    details: Fallacy، PACELC، CAP، Replication، Resilience، Gateway، CQRS · پروفایل Compose
 ---

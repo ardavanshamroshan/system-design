@@ -9,9 +9,9 @@ System design and software architecture documentation, styled like Laravel docs,
 | Group | Pages |
 |-------|--------|
 | Fundamentals & Algorithms | Big O, Sort/Search, Common Algorithms |
-| Software Patterns | CQRS, Directory Query, Cache Patterns, Outbox |
-| System Architecture | API Gateway, CAP Theorem |
-| Messaging | DLQ, Brokers, Acknowledgment |
+| Software Patterns | CQRS, Directory Query, Cache Patterns, Outbox, Saga |
+| System Architecture | Fallacies & PACELC, CAP Theorem, Replication, Resilience, API Gateway |
+| Messaging | DLQ, Brokers, Acknowledgment, Outbox, Saga |
 | Database | Connection Pool, Locking |
 | DevOps | Docker Compose Profiles |
 

@@ -19,7 +19,7 @@ features:
   - title: B — Data
     details: Lock, Pool, Cache — correctness and performance
   - title: C — Messaging
-    details: Broker, Ack, DLQ, Outbox — async reliability
+    details: Broker, Ack, DLQ, Outbox, Saga — async reliability
   - title: D / E — Architecture & Ops
-    details: CAP, Gateway, CQRS, Query · Compose profiles
+    details: Fallacies, PACELC, CAP, Replication, Resilience, Gateway, CQRS · Compose profiles
 ---

@@ -37,7 +37,7 @@
 CAP **فقط در زمان partition** معنا دارد. روز عادی ممکن است C و A هر دو خوب به‌نظر برسند. تلهٔ مصاحبه: CAP را «هر روز برای همیشه دو تا از سه» گرفتن.
 :::
 
-مرتبط: [API Gateway](/fa/architecture/api-gateway) · [Outbox](/fa/patterns/outbox) · [Brokerها](/fa/messaging/brokers)
+مرتبط: [Fallacyها و PACELC](/fa/architecture/fallacies-pacelc) · [Replication](/fa/architecture/replication) · [API Gateway](/fa/architecture/api-gateway) · [Outbox](/fa/patterns/outbox) · [Brokerها](/fa/messaging/brokers)
 
 ---
 

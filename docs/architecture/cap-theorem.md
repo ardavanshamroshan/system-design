@@ -37,7 +37,7 @@ In practice **P is nearly mandatory** for any real distributed system. The usefu
 CAP **only bites during a partition**. On a healthy day C and A can both look fine. Interview trap: treating CAP as “every day, pick two forever.”
 :::
 
-Related: [API Gateway](/architecture/api-gateway) · [Outbox](/patterns/outbox) · [Brokers](/messaging/brokers)
+Related: [Fallacies & PACELC](/architecture/fallacies-pacelc) · [Replication](/architecture/replication) · [API Gateway](/architecture/api-gateway) · [Outbox](/patterns/outbox) · [Brokers](/messaging/brokers)
 
 ---
 

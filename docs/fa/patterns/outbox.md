@@ -36,7 +36,7 @@ API ──tx──► DB (orders + outbox)
                  Broker ──► consumers
 ```
 
-مرتبط: [Acknowledgment](/fa/messaging/acknowledgment) · [Brokerها](/fa/messaging/brokers) · [DLQ](/fa/messaging/dlq)
+مرتبط: [Acknowledgment](/fa/messaging/acknowledgment) · [Brokerها](/fa/messaging/brokers) · [DLQ](/fa/messaging/dlq) · [Saga](/fa/patterns/saga)
 
 ---
 
