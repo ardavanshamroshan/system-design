@@ -1,0 +1,18 @@
+{
+  "$comment": "Whitelist only. Everything else is paid and MUST NOT appear in the public free build.",
+  "paths": [
+    "/",
+    "/fundamentals/algorithm-analysis",
+    "/fundamentals/big-o",
+    "/design/principles",
+    "/design/architecture-styles",
+    "/design/design-patterns",
+    "/design/gof/",
+    "/design/gof/solid/srp",
+    "/design/gof/creational/factory-method",
+    "/database/transactions-acid",
+    "/handbook/",
+    "/interview/",
+    "/resources/references"
+  ]
+}
